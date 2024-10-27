@@ -168,8 +168,8 @@ class WPSight_General {
 			$standard_details_option = (array) wpsight_get_option( $detail, $value );
 
             if ( ! empty( $standard_details_option ) ) {
-				$standard_details[ $detail ]['label'] = $standard_details_option['label'];
-				$standard_details[ $detail ]['unit'] = $standard_details_option['unit'];
+				$standard_details[ $detail ]['label'] = $standard_details_option['label'] ?? '';
+				$standard_details[ $detail ]['unit'] = $standard_details_option['unit'] ?? '';
 			}
 
 		}
@@ -535,7 +535,7 @@ class WPSight_General {
 				'show_in_admin_all_list'	=> false,
 				'show_in_admin_status_list'	=> false,
 				// Translators: %s is listing name
-				'label_count'				=> _n_noop( 'Preview <span class="count">(%s)</span>', 'Preview <span class="count">(%s)</span>', 'wpcasa' )
+				'label_count'				=> _n_noop( 'Preview <span class="count">(%s)</span>', 'Previews <span class="count">(%s)</span>', 'wpcasa' )
 			),
 			'pending_payment' => array(
 				'name'						=> _x( 'Pending', 'listing post status', 'wpcasa' ),
@@ -545,7 +545,7 @@ class WPSight_General {
 				'show_in_admin_all_list'	=> true,
 				'show_in_admin_status_list'	=> true,
 				// Translators: %s is listing name which payment is pending
-				'label_count'				=> _n_noop( 'Pending Payment <span class="count">(%s)</span>', 'Pending Payment <span class="count">(%s)</span>', 'wpcasa' )
+				'label_count'				=> _n_noop( 'Pending Payment <span class="count">(%s)</span>', 'Pending Payments <span class="count">(%s)</span>', 'wpcasa' )
 			),
 			'trash' => array(
 				'name'	=> _x( 'Trash', 'listing post status', 'wpcasa' ),
@@ -607,7 +607,8 @@ class WPSight_General {
 			'brl' => __( 'BRL => Brazilian Real', 'wpcasa' ),
 			'bwp' => __( 'BWP => Botswanan Pula', 'wpcasa' ),
 			'cad' => __( 'CAD => Canadian Dollar', 'wpcasa' ),
-			'chf' => __( 'CHF => Swiss Franc', 'wpcasa' ),
+			'chf_sfr' => __( 'CHF => Swiss Franc (SFr.)', 'wpcasa' ),
+			'chf' => __( 'CHF => Swiss Franc (CHF)', 'wpcasa' ),
 			'clp' => __( 'CLP => Chilean Peso', 'wpcasa' ),
 			'cny' => __( 'CNY => Chinese Yuan', 'wpcasa' ),
 			'cop' => __( 'COP => Colombian Peso', 'wpcasa' ),
@@ -771,7 +772,7 @@ class WPSight_General {
 			elseif ( $currency == 'JPY' ) {
 				$currency_ent = '&yen;';
 			}
-			elseif ( $currency == 'CHF' ) {
+			elseif ( $currency == 'CHF_SFR' ) {
 				$currency_ent = ' SFr. ';
 			}
 			elseif ( $currency == 'ILS' ) {
