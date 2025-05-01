@@ -6,7 +6,7 @@ Tags: listings, property, real-estate, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
 Tested up to: 6.8
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,7 +63,7 @@ WPCasa comes with readable & well-documented code with loads of actions, filters
 
 = Translation Ready =
 
-The real estate business is international. And so is WPCasa. The framework and all our add-ons and themes are translation-ready and comes with 11 translations on board.
+The real estate business is international. And so is WPCasa. The plugin and all our add-ons and themes are translation-ready. You can show your listings in multiple languages.
 
 = Translations =
 
@@ -231,6 +231,9 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.4.1 =
+* FIX: The license page may show an error under certain circumstances
+
 = 1.4.0 =
 * NEW: Added basic compatibility with the block editor and REST API endpoints for listings and all related taxonomies.
 * NEW: Added energy efficiency diagram to page printout. Requires [WPCasa Energy Efficiency](https://wpcasa.com/downloads/wpcasa-energy-efficiency).
@@ -427,13 +430,17 @@ Andrea Manzato
 * Initial release
 
 == Upgrade Notice ==
+= 1.4.1 =
+With this version we are starting to add basic compatibility with block editor (aka Gutenberg). It includes also new REST API endpoints for listings and all associated taxonomies. You can control this new feature on the settings page.
+In addition, we have renamed Twitter to X to match the official wording and we have fixed an issue on the license page.
+
 = 1.4.0 =
 With this version we are starting to add basic compatibility with block editor (aka Gutenberg). It includes also new REST API endpoints for listings and all associated taxonomies. You can control this new feature on the settings page.
 In addition, we have renamed Twitter to X to match the official wording.
 
 = 1.3.0 =
 We have changed the loading of the language files of [GlotPress](https://translate.wordpress.org/projects/wp-plugins/wpcasa/). This means that the language files included in the plugin are no longer available. If you find that the WPCasa output is now in English instead of your local language, please go to [GlotPress](https://translate.wordpress.org/projects/wp-plugins/wpcasa/) and translate WPCasa into your local language. This way the community can benefit from your translation, just as you benefit from WPCasa.
-Please note: WordPress 6.6 has droped support for PHP 7.0 and 7.1, so in the upcoming updates we will also drop PHP support for older and unsecure PHP versions up to PHP 7.1. If you would like to benefit from further WPCasa updates from the end of 2024, please keep in mind that you must be running at least PHP 7.2 on your server.
+Please note: WordPress 6.6 has dropped support for PHP 7.0 and 7.1, so in the upcoming updates we will also drop PHP support for older and unsecure PHP versions up to PHP 7.1. If you would like to benefit from further WPCasa updates from the end of 2024, please keep in mind that you must be running at least PHP 7.2 on your server.
 
 = 1.2.13 =
 We have fixed the non-functioning QR code on the single page and made sure that WPCasa works correctly with WordPress 6.6.

@@ -110,14 +110,23 @@ class WPSight_About {
                             </style>
 
                             <ul class="tabs" data-tabgroup="first-tab-group">
-                                <li class="tab"><a href="#version-1-4-0" class="active">v1.4.0</a></li>
+                                <li class="tab"><a href="#version-1-4-1" class="active">v1.4.1</a></li>
+                                <li class="tab"><a href="#version-1-4-0">v1.4.0</a></li>
                                 <li class="tab"><a href="#version-1-3-1">v1.3.1</a></li>
                                 <li class="tab"><a href="#version-1-3-0" >v1.3.0</a></li>
-                                <li class="tab"><a href="#version-1-2-13">v1.2.13</a></li>
                                 <li><a href="https://wordpress.org/plugins/wpcasa/#developers" target="_blank"><?php echo esc_html__( 'More', 'wpcasa' ); ?></a></li>
                             </ul>
 
                             <section id="first-tab-group" class="tabgroup">
+                                <div id="version-1-4-1">
+                                    <p>Version: 1.4.1</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>The license page may show an error under certain circumstances</td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-4-0">
                                     <p>Version: 1.4.0</p>
                                     <table>
@@ -215,16 +224,6 @@ class WPSight_About {
                                     </table>
                                 </div>
 
-                                <div id="version-1-2-13">
-                                    <p>Version: 1.2.13</p>
-                                    <table>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>QR code on listing single page was not working anymore. Switched from Google to the free QR Code Generator <a href="https://goqr.me" target="_blank">goqr.me</a></td>
-                                        </tr>
-                                    </table>
-                                </div>
-
                             </section>
 
                             <script type="text/javascript">
@@ -248,6 +247,15 @@ class WPSight_About {
                         </div>
 
                         <?php /*?>
+                                 <div id="version-1-2-13">
+                                    <p>Version: 1.2.13</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>QR code on listing single page was not working anymore. Switched from Google to the free QR Code Generator <a href="https://goqr.me" target="_blank">goqr.me</a></td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-2-12">
                                     <p>Version: 1.2.12</p>
                                     <table>
