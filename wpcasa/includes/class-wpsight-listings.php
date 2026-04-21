@@ -1472,20 +1472,131 @@ class WPSight_Listings {
     }
 
     /**
+     * maybe_delete_listing_media()
+     *
+     * Delete listing media files when the listing is permanently deleted
+     * and the related option is enabled in the settings.
+     *
+     * @param int          $post_id Listing post ID.
+     * @param WP_Post|null $post    Post object.
+     *
+     * @return void
+     *
+     * @uses get_post()
+     * @uses wpsight_get_option()
+     * @uses wpsight_post_type()
+     * @uses self::get_listing_media_attachment_ids()
+     * @uses wp_attachment_is_image()
+     * @uses wp_delete_attachment()
+     *
+     * @since 1.5.0
+     */
+    public static function maybe_delete_listing_media( int $post_id, ?WP_Post $post = null ) : void {
+
+        if ( ! $post instanceof WP_Post ) {
+            $post = get_post( $post_id );
+        }
+
+        if ( ! $post instanceof WP_Post || wpsight_post_type() !== $post->post_type ) {
+            return;
+        }
+
+        if ( ! apply_filters( 'wpsight_listings_delete_media', wpsight_get_option( 'listings_delete_media' ) ) ) {
+            return;
+        }
+
+        $attachment_ids = self::get_listing_media_attachment_ids( $post_id );
+
+        if ( empty( $attachment_ids ) ) {
+            return;
+        }
+
+        foreach ( $attachment_ids as $attachment_id ) {
+            if ( ! wp_attachment_is_image( $attachment_id ) ) {
+                continue;
+            }
+
+            // Force delete to remove the physical file as requested in settings.
+            wp_delete_attachment( $attachment_id, true );
+        }
+
+    }
+
+    /**
+     * get_listing_media_attachment_ids()
+     *
+     * Collect all image attachments that belong to a listing.
+     *
+     * @param int $listing_id Listing post ID.
+     *
+     * @return array Attachment IDs.
+     *
+     * @uses get_post_meta()
+     * @uses get_posts()
+     * @uses wp_parse_id_list()
+     * @uses get_post_thumbnail_id()
+     *
+     * @since 1.5.0
+     */
+    protected static function get_listing_media_attachment_ids( int $listing_id ): array {
+
+        $attachment_ids = array();
+        $thumbnail_id   = get_post_thumbnail_id( $listing_id );
+        $gallery        = get_post_meta( $listing_id, '_gallery', true );
+
+        if ( $thumbnail_id ) {
+            $attachment_ids[] = $thumbnail_id;
+        }
+
+        if ( is_array( $gallery ) ) {
+            foreach ( $gallery as $gallery_key => $gallery_value ) {
+
+                // New gallery format stores attachment IDs as keys and URLs as values.
+                if ( is_numeric( $gallery_key ) && ! is_numeric( $gallery_value ) ) {
+                    $attachment_ids[] = absint( $gallery_key );
+                }
+
+                // Legacy gallery format stores attachment IDs as values.
+                if ( is_numeric( $gallery_value ) ) {
+                    $attachment_ids[] = absint( $gallery_value );
+                }
+            }
+        }
+
+        $child_attachments = get_posts(
+            array(
+                'post_type'      => 'attachment',
+                'posts_per_page' => -1,
+                'post_parent'    => $listing_id,
+                'post_mime_type' => 'image',
+                'fields'         => 'ids',
+            )
+        );
+
+        if ( is_array( $child_attachments ) ) {
+            $attachment_ids = array_merge( $attachment_ids, $child_attachments );
+        }
+
+        return wp_parse_id_list( array_unique( $attachment_ids ) );
+
+    }
+
+    /**
      *  search_listing_id()
      *
      *  Perform a search in various listings fields for given string
      *
      *  @param string $search
-     *  @uses wpsight_get_option()
+     *
+     *  @return  mixed Array of post IDs, false if no previews deleted
+     *
      *  @uses wpsight_post_type()
      *  @uses WP_Query()
      *  @uses wp_list_pluck()
-     *  @return  mixed Array of post IDs, false if no previews deleted
-     *
+     *  @uses wpsight_get_option()
      *  @since 1.0.0
      */
-    public static function search_listing_id( $search ) {
+    public static function search_listing_id( string $search ) {
 
         $prefix = wpsight_get_option( 'listing_id' );
 

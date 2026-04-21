@@ -6,7 +6,7 @@
  */
 global $listing; ?>
 
-<div class="wpsight-listing wpsight-listing-<?php echo esc_attr( $listing->ID ); ?> entry-content" itemscope itemtype="http://schema.org/Product">
+<div class="wpsight-listing wpsight-listing-<?php echo esc_attr( $listing->ID ); ?> entry-content" itemscope itemtype="https://schema.org/Product">
 
 	<meta itemprop="name" content="<?php echo esc_attr( $listing->post_title ); ?>" />
 
@@ -20,7 +20,7 @@ global $listing; ?>
 	
 	<?php if ( $listing->post_status != 'expired' || wpsight_user_can_edit_listing( $listing->ID ) ) : ?>
 	
-		<div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+		<div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
 
 			<?php do_action( 'wpsight_listing_single_before', $listing->ID ); ?>
 

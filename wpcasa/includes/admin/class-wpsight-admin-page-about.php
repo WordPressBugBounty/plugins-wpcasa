@@ -63,61 +63,60 @@ class WPSight_About {
                         <div class="changelog">
                             
                             <h3><?php echo esc_html__( 'Changelog', 'wpcasa' ) ?></h3>
-                            
-                            <style>
-                                
-                            .tabs {
-                                width: 100%;
-                                float: left;
-                                margin: 0;
-                                padding: 0;
-                            }
-
-                            .tabs li {
-                                float: left;
-                                width: 20%;
-                                margin: 0;
-                            }
-
-                            .tabs a {
-                                display: block;
-                                text-align: center;
-                                text-decoration: none;
-                                color: #999;
-                                padding: 10px 0;
-                                background: rgba(0,0,0,.1);
-                            }
-
-                            .tabs a:hover,
-                            .tabs a.active {
-                                background: #12AE8F;
-                                color: #FFF;
-                            }
-                                
-                            .tabs a:focus {box-shadow: none;}
-
-                            .tabgroup {
-                                width: 100%;
-                                float: left;
-                            }
-
-                            .tabgroup div {
-                                padding: 30px;
-                            }
-                                
-                            .tabgroup div p {margin-bottom: 30px;}
-
-                            </style>
 
                             <ul class="tabs" data-tabgroup="first-tab-group">
-                                <li class="tab"><a href="#version-1-4-3" class="active">v1.4.3</a></li>
+                                <li class="tab"><a href="#version-1-5-0" class="active">v1.5.0</a></li>
+                                <li class="tab"><a href="#version-1-4-3">v1.4.3</a></li>
                                 <li class="tab"><a href="#version-1-4-2">v1.4.2</a></li>
                                 <li class="tab"><a href="#version-1-4-1">v1.4.1</a></li>
-                                <li class="tab"><a href="#version-1-4-0">v1.4.0</a></li>
                                 <li><a href="https://wordpress.org/plugins/wpcasa/#developers" target="_blank"><?php echo esc_html__( 'More', 'wpcasa' ); ?></a></li>
                             </ul>
 
                             <section id="first-tab-group" class="tabgroup">
+                                <div id="version-1-5-0">
+                                    <p>Version: 1.5.0</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-new">New</span></td>
+                                            <td>An option has been added to delete the listings media files when a listing is deleted.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-new">New</span></td>
+                                            <td>An admin notice was added for outdated WPCasa themes that require an update to keep the single listing location output working.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-new">New</span></td>
+                                            <td>A notice was added inviting users to <a href="https://wordpress.org/plugins/wpcasa/#reviews" target="_blank">review WPCasa</a> on WordPress.org.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-new">New</span></td>
+                                            <td>Helpful links were added to the plugin row meta on the plugins screen.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Creating WPCasa user roles is now handled on activation and remove them on deactivation.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Load Google Maps API only when an API key is available</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Improved Google Maps API loading with async callback handling for listing maps</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Improved message handling for discontinued WPCasa add-ons</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>The file uninstall.php was introduced to remove all WPCasa data when uninstalling the plugin.</td>
+                                        </tr>                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Improved PHP 8 compatibility</td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-4-3">
                                     <p>Version: 1.4.3</p>
                                     <table>

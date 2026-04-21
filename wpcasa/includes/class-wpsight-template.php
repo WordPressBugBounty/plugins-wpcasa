@@ -179,7 +179,7 @@ class WPSight_Template {
 		// Setup $orderby markup
 		$orderby = '';
 
-		if ( $args['orderby'] || $args['order'] ) {
+        if ( ( isset( $args['orderby'] ) || isset( $args['order'] ) ) && isset( $args['type'] )  ) {
 
 			ob_start();
 			

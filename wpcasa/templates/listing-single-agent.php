@@ -7,7 +7,7 @@
  */
 global $listing; ?>
 
-<div class="wpsight-listing-section wpsight-listing-section-agent" itemprop="seller" itemscope itemtype="http://schema.org/RealEstateAgent">
+<div class="wpsight-listing-section wpsight-listing-section-agent" itemprop="seller" itemscope itemtype="https://schema.org/RealEstateAgent">
 	
 	<?php do_action( 'wpsight_listing_single_agent_before', $listing->ID ); ?>
 

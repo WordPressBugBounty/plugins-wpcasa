@@ -338,17 +338,46 @@ function wpsight_get_listings_map( $atts = array(), $map_query = array() ) {
 	endwhile;
     wp_reset_query();
 
-	if ( ! wp_script_is( 'wpsight-listings-map', 'registered' ) ) {
+	if ( ! wp_script_is( 'wpsight-google-maps-loader', 'registered' ) ) {
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_enqueue_script( 'jquery' );
-		wp_register_script('cookie', WPSIGHT_PLUGIN_URL . '/assets/js/jquery.cookie' . $suffix .'.js', array(), false, false );
-		wp_enqueue_script( 'cookie' );
-		wp_register_script( 'wpsight-listings-map', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/wpcasa-listings-map' . $suffix . '.js', array( 'wpsight-map-googleapi', 'wpsight-map-markerclusterer', 'wpsight-map-infobox' ), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => true ) );
+		wp_register_script( 'wpsight-google-maps-loader', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/wpsight-google-maps-loader' . $suffix . '.js', array(), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => true ) );
 	}
 
+	$suffix  = SCRIPT_DEBUG ? '' : '.min';
+	$api_key = wpsight_get_option( 'google_maps_api_key' );
+	$api_url = '';
 
-	wp_enqueue_script( 'wpsight-listings-map' );
-	wp_localize_script( 'wpsight-listings-map', 'wpsightMap', apply_filters( 'wpsight_listings_map_options', $map_options ) );
+	if ( ! empty( $api_key ) && true === apply_filters( 'wpsight_google_maps', true ) ) {
+		$api_url = add_query_arg(
+			array(
+				'key'      => $api_key,
+				'loading'  => 'async',
+				'callback' => 'wpsightGoogleMapsApiReady',
+			),
+			'//maps.googleapis.com/maps/api/js'
+		);
+
+		$api_url = apply_filters( 'wpsight_google_maps_endpoint', $api_url, $api_key );
+	}
+
+	wp_enqueue_script( 'jquery' );
+	wp_register_script( 'cookie', WPSIGHT_PLUGIN_URL . '/assets/js/jquery.cookie' . $suffix . '.js', array(), false, false );
+	wp_enqueue_script( 'cookie' );
+	wp_enqueue_script( 'wpsight-google-maps-loader' );
+
+	wp_localize_script( 'wpsight-google-maps-loader', 'wpsightMap', apply_filters( 'wpsight_listings_map_options', $map_options ) );
+	wp_localize_script(
+		'wpsight-google-maps-loader',
+		'wpsightMapLoader',
+		array(
+			'googleApiUrl' => $api_url,
+			'scripts'      => array(
+				WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/infobox' . $suffix . '.js?ver=' . WPSIGHT_LISTINGS_MAP_VERSION,
+				WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/markerclusterer' . $suffix . '.js?ver=' . WPSIGHT_LISTINGS_MAP_VERSION,
+				WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/wpcasa-listings-map' . $suffix . '.js?ver=' . WPSIGHT_LISTINGS_MAP_VERSION,
+			),
+		)
+	);
 	
 	if( $map_query->have_posts() ) {
 

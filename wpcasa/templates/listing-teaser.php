@@ -1,10 +1,10 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
 
-<div class="wpsight-listing-teaser entry-content" itemscope itemtype="http://schema.org/Product">
+<div class="wpsight-listing-teaser entry-content" itemscope itemtype="https://schema.org/Product">
 
 	<meta itemprop="name" content="<?php echo esc_attr( $post->post_title ); ?>" />
 	
-	<div itemprop="offers" class="clearfix" itemscope itemtype="http://schema.org/Offer">
+	<div itemprop="offers" class="clearfix" itemscope itemtype="https://schema.org/Offer">
 
 		<?php do_action( 'wpsight_listing_teaser_before' ); ?>
 

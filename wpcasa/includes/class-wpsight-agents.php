@@ -16,6 +16,97 @@ class WPSight_Agents {
 	}
 
 	/**
+	 * init_user_roles()
+	 *
+	 * Create or reinitialize custom agent roles.
+	 *
+	 * @uses self::remove_user_roles()
+	 * @uses wpsight_agent_roles()
+	 * @uses get_role()
+	 * @uses add_role()
+	 * @uses WP_Roles::add_cap()
+	 * @return void
+	 *
+	 * @since 1.5.0
+	 */
+	public static function init_user_roles() {
+		global $wp_roles;
+
+		if ( class_exists( 'WP_Roles' ) && ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		if ( ! is_object( $wp_roles ) ) {
+			return;
+		}
+
+		$agent_roles = wpsight_agent_roles();
+
+		self::remove_user_roles();
+
+		// Add listing_admin caps to administrator.
+		foreach ( $agent_roles['listing_admin']['caps'] as $cap => $granted ) {
+			if ( $granted ) {
+				$wp_roles->add_cap( 'administrator', $cap );
+			}
+		}
+
+		// Add agent roles with caps.
+		foreach ( $agent_roles as $role ) {
+			add_role( $role['id'], $role['name'], $role['caps'] );
+
+			/**
+			 * Add level_1 to caps to show custom roles in author dropdown.
+			 *
+			 * @see https://core.trac.wordpress.org/ticket/16841
+			 */
+			$user_role = get_role( $role['id'] );
+
+			if ( $user_role ) {
+				$user_role->add_cap( 'level_1' );
+			}
+		}
+	}
+
+	/**
+	 * remove_user_roles()
+	 *
+	 * Remove custom agent roles and related administrator capabilities.
+	 *
+	 * @uses wpsight_agent_roles()
+	 * @uses remove_role()
+	 * @uses WP_Roles::remove_cap()
+	 * @return void
+	 *
+	 * @since 1.5.0
+	 */
+	public static function remove_user_roles() {
+		global $wp_roles;
+
+		if ( class_exists( 'WP_Roles' ) && ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		if ( ! is_object( $wp_roles ) ) {
+			return;
+		}
+
+		$agent_roles = wpsight_agent_roles();
+
+		// Remove listing_admin caps from administrator.
+		foreach ( $agent_roles['listing_admin']['caps'] as $cap => $granted ) {
+			if ( $granted ) {
+				$wp_roles->remove_cap( 'administrator', $cap );
+			}
+		}
+
+		// Remove all custom agent roles.
+		foreach ( $agent_roles as $role ) {
+			remove_role( $role['id'] );
+		}
+	}
+
+	/**
 	 * agent_roles()
 	 *
 	 * Define custom user roles for agents:

@@ -39,6 +39,9 @@ class WPSight_Post_Type_Listing {
         // Delete old listing previews to clean up
 		add_action( 'wpsight_delete_listing_previews', array( $this, 'delete_listing_previews' ) );
 
+		// Optionally delete listing media files on permanent removal.
+		add_action( 'before_delete_post', array( 'WPSight_Listings', 'maybe_delete_listing_media' ), 10, 2 );
+
 		// Handle custom statuses in publish box
 
 		foreach ( array( 'post', 'post-new' ) as $hook )

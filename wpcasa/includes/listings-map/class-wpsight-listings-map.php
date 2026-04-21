@@ -115,14 +115,8 @@ class WPSight_Listings_Map {
 
 		wp_enqueue_style( 'wpsight-listings-map', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/css/wpsight-listings-map' . $suffix . '.css', WPSIGHT_LISTINGS_MAP_VERSION, 'all' );
 
-
-		wp_register_script( 'wpsight-map-googleapi', '//maps.googleapis.com/maps/api/js', null, WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => false ) );
-
-		wp_register_script( 'wpsight-map-infobox', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/infobox' . $suffix . '.js', array( 'wpsight-map-googleapi' ), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => false ) );
-
-		wp_register_script( 'wpsight-map-markerclusterer', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/markerclusterer' . $suffix . '.js', array( 'wpsight-map-googleapi' ), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => false ) );
-		
-		wp_register_script( 'wpsight-listings-map', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/wpcasa-listings-map' . $suffix . '.js', array( 'wpsight-map-googleapi', 'wpsight-map-markerclusterer', 'wpsight-map-infobox' ), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => false ) );
+		// Register the async map bootstrapper for front-end maps.
+		wp_register_script( 'wpsight-google-maps-loader', WPSIGHT_LISTINGS_MAP_PLUGIN_URL . '/assets/js/wpsight-google-maps-loader' . $suffix . '.js', array(), WPSIGHT_LISTINGS_MAP_VERSION, array( 'in_footer' => true ) );
 
 	}
 

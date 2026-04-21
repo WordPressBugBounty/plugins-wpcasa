@@ -4,14 +4,14 @@
  *
  * @package           WPCasa
  * @author            WPSight
- * @copyright         2025 Kybernetik Services GmbH
+ * @copyright         2026 Kybernetik Services LLC
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name:       WPCasa
+ * Plugin Name:       WPCasa - Real Estate for WordPress
  * Plugin URI:        https://wordpress.org/plugins/wpcasa/
  * Description:       Flexible WordPress plugin to create professional real estate websites and manage property listings with ease.
- * Version:           1.4.3
+ * Version:           1.5.0
  * Requires at least: 6.2
  * Requires PHP:      7.2
  * Author:            WPSight
@@ -168,9 +168,11 @@ class WPSight_Framework {
         // Activation
 
         register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), [ $this->post_types, 'register_post_type_listing' ], 10 );
+        register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WPSight_Agents', 'init_user_roles' ), 10 );
         register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), function() { include_once('includes/class-wpsight-install.php'); }, 10 );
         register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
         register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), [ $this, 'activation' ] );
+        register_deactivation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WPSight_Agents', 'remove_user_roles' ) );
 
         // Actions
 
@@ -230,15 +232,36 @@ class WPSight_Framework {
 
         wp_localize_script( 'wpsight-listings-search', 'wpsight_localize', $data );
 
-        // Enqueue Google Maps (optionally with API key)
+        // Register the Google Maps API loader when a key is available.
+        $api_key = wpsight_get_option( 'google_maps_api_key' );
 
-        if( true == apply_filters( 'wpsight_google_maps', true ) ) {
+        if ( ! empty( $api_key ) && true === apply_filters( 'wpsight_google_maps', true ) ) {
+            $api_url = add_query_arg(
+                array(
+                    'key'      => $api_key,
+                    'loading'  => 'async',
+                    'callback' => 'wpsightGoogleMapsApiReady',
+                ),
+                '//maps.googleapis.com/maps/api/js'
+            );
 
-            $api_key = wpsight_get_option( 'google_maps_api_key' );
-            $api_url = $api_key ? add_query_arg( [ 'key' => $api_key ], '//maps.googleapis.com/maps/api/js' ) : '//maps.googleapis.com/maps/api/js';
+            wp_register_script(
+                'wpsight-google-maps-api-loader',
+                WPSIGHT_PLUGIN_URL . '/assets/js/wpsight-google-maps-api-loader' . $suffix . '.js',
+                array(),
+                WPSIGHT_VERSION,
+                array( 'in_footer' => false )
+            );
 
-            wp_enqueue_script( 'wpsight-map-googleapi', apply_filters( 'wpsight_google_maps_endpoint', esc_url( $api_url ), $api_key ), null, WPSIGHT_VERSION, array( 'in_footer' => false ) );
+            wp_localize_script(
+                'wpsight-google-maps-api-loader',
+                'wpsightGoogleMapsApiLoader',
+                array(
+                    'googleApiUrl' => apply_filters( 'wpsight_google_maps_endpoint', $api_url, $api_key ),
+                )
+            );
 
+            wp_enqueue_script( 'wpsight-google-maps-api-loader' );
         }
 
         if( true == apply_filters('wpsight_css', true) && wpsight_get_option('listings_css' ) ) {
@@ -295,7 +318,8 @@ class WPSight_Framework {
             'currency_symbol'		=> 'before',
             'currency_separator'	=> 'comma',
             'date_format'			=> get_option( 'date_format' ),
-            'listings_css'			=> '1'
+            'listings_css'			=> '1',
+            'review_notice_timestamp' => current_time( 'timestamp' ),
         ];
 
         // Add default standard features
@@ -385,13 +409,15 @@ function wpsight_admin_plugins_delete_notice() {
     $plugin_name    = '';
     $count          = 1;
 
-    if( file_exists( $admin_map_ui ) ) {
+    //if( file_exists( $admin_map_ui ) ) {
+	if( in_array( $admin_map_ui, apply_filters( 'active_plugins', get_option( 'active_plugins') ) ) ) {
 
-        $plugin_name .= '<strong>WPCasa Admin Map UI</strong>';
+		$plugin_name .= '<strong>WPCasa Admin Map UI</strong>';
 
     }
 
-    if( file_exists( $listing_map ) ) {
+    //if( file_exists( $listing_map ) ) {
+	if( in_array( $listing_map, apply_filters( 'active_plugins', get_option( 'active_plugins') ) ) ) {
 
         if( !empty( $plugin_name ) ) {
 
@@ -483,5 +509,3 @@ function wpcasa_settings_value_change() {
     }   
 }
 add_action( 'admin_init', 'wpcasa_settings_value_change' );
-
-

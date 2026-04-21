@@ -44,7 +44,7 @@
 	z-index: 1;
 	text-decoration: none;
 	background-position: center !important;
-	padding-top: 120px;
+	padding-top: 140px;
 	background: #12AE8F url(../img/icon.png) no-repeat;
 	background-size: contain;
 	box-shadow: 0 0 50px rgba(0, 0, 0, .5);
@@ -141,3 +141,45 @@
 .section .changelog-entry-new    {color: rgb(255, 204, 102);}
 .section .changelog-entry-fix    {color: rgb(255, 155, 51);}
 .section .changelog-entry-update {color: rgb(102, 204, 255);}
+
+/* Tabs */
+.wpcasa-about .tabs {
+	width: 100%;
+	float: left;
+	margin: 0;
+	padding: 0;
+}
+
+.wpcasa-about .tabs li {
+	float: left;
+	width: 20%;
+	margin: 0;
+}
+
+.wpcasa-about .tabs a {
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: #999;
+	padding: 10px 0;
+	background: rgba(0,0,0,.1);
+}
+
+.wpcasa-about .tabs a:hover,
+.wpcasa-about .tabs a.active {
+	background: #12AE8F;
+	color: #FFF;
+}
+
+.wpcasa-about .tabs a:focus {box-shadow: none;}
+
+.wpcasa-about .tabgroup {
+	width: 100%;
+	float: left;
+}
+
+.wpcasa-about .tabgroup div {
+	padding-block: 30px;
+}
+
+.wpcasa-about .tabgroup div p {margin-bottom: 30px;}

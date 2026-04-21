@@ -1,10 +1,10 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
 
-<div id="listing-<?php the_ID(); ?>" <?php wpsight_listing_class( 'entry-content listing-archive' ); ?> itemscope itemtype="http://schema.org/Product">
+<div id="listing-<?php the_ID(); ?>" <?php wpsight_listing_class( 'entry-content listing-archive' ); ?> itemscope itemtype="https://schema.org/Product">
 
 	<meta itemprop="name" content="<?php echo esc_attr( $post->post_title ); ?>" />
 	
-	<div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="clearfix">
+	<div itemprop="offers" itemscope itemtype="https://schema.org/Offer" class="clearfix">
 
 		<?php do_action( 'wpsight_listing_archive_before', $post ); ?>
 		

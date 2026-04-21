@@ -1,20 +1,21 @@
-=== WPCasa ===
-Contributors: wpsight, kybernetikservices, mrinal013
+=== WPCasa - Real Estate for WordPress ===
+Contributors: wpsight, kybernetikservices
 Plugin URI: https://wordpress.org/plugins/wpcasa/
 Donate link: https://www.paypal.com/donate/?hosted_button_id=SYJNVSP2BKTQ4
-Tags: listings, property, real-estate, rental, realtor
+Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
-Tested up to: 6.9
-Stable tag: 1.4.3
+Tested up to: 7.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Flexible WordPress plugin to create professional real estate websites and manage property listings with ease.
+Flexible WordPress plugin to create professional real estate websites and manage property listings with ease. WPCasa is a worthy choice for single agents and portals.
 
 == Description ==
 
 WPCasa is a **real estate** WordPress solution that provides an intuitive way to manage property listings and create first-class real estate websites. No coding required.
+User-friendly intuitive interface. Clean design. Flexible functionality.
 
 * Website: [wpcasa.com](https://wpcasa.com)
 * Demo: [try.wpcasa.com](https://try.wpcasa.com)
@@ -26,9 +27,37 @@ WPCasa is a **real estate** WordPress solution that provides an intuitive way to
 > Check out our latest themes [WPCasa Madrid](https://wpcasa.com/downloads/wpcasa-madrid), [WPCasa Oslo](https://wpcasa.com/downloads/wpcasa-oslo/)
 and [WPCasa London](https://wpcasa.com/downloads/wpcasa-london).
 
+= Main features =
+
+* Quick Setup
+* Awesome Listing management
+* Demo data available for import at https://docs.wpcasa.com/article/import-example-data/
+* Create unlimited number of listing details of type: flexible, m2, sq ft, sq yd, acre(s)
+* Manage rental periods per month, per week, per year and per day.
+* Google Map support
+* Sorting by price, date, title
+* Customizable location, categories, types, statuses, features, amenities
+* Customizable property labels (featured, hot, openhouse) with [WPCasa Listing Labels](https://wpcasa.com/downloads/wpcasa-listing-labels/)
+* Saved wishlists with [WPCasa Listing Favorites](https://wpcasa.com/downloads/wpcasa-favorites/)
+* Mortgage calculator with [WPCasa Mortgage Calculator](https://wpcasa.com/downloads/wpcasa-mortgage-calculator/)
+* Multilingual support (WPML compatible, dedicated Polylang support with our [free add-on](https://wordpress.org/plugins/wpcasa-polylang/))
+* Energy certificate available with [WPCasa Energy Efficiency](https://wpcasa.com/downloads/wpcasa-energy-efficiency/)
+* Support for several contact form plugins (e.g. Contact Form 7, Ninja Forms)
+* Full search widget, extendable with our free add-on [WPCasa Advanced Search](https://wordpress.org/plugins/wpcasa-advanced-search/)
+* Unlimited currencies
+* RTL CSS (full support for right-to-left languages)
+* Easy use with [shortcodes](https://docs.wpcasa.com/article/category/shortcodes/)
+* Compatible with all WordPress themes
+* Individually expandable, according to your own needs
+* Developer-friendly with many hooks and [full documentation](https://docs.wpcasa.com/)
+* Collection of [useful snippets](https://docs.wpcasa.com/article/category/snippets/)
+* Continuous development
+* Fully GDPR compliant
+* and much, much more...
+
 = Easy as WordPress =
 
-WPCasa fully integrates with the familiar and easy-to-use interface that ships with WordPress. You'll be a PRO.
+WPCasa Real Estate fully integrates with the familiar and easy-to-use interface that ships with WordPress. You'll be a PRO.
 
 = Flexible & Extendable =
 
@@ -55,6 +84,7 @@ You can manage great numbers of listings using the well-organized property list 
 Select the location of your properties through the map in the editor, display the location of each property on a single listing map, or showcase all of your listings on the overall listings map.
 
 = Intuitive Options =
+
 Setup date format, measurement units, listing details and much more via the intuitive and easy-to-understand admin interface
 
 = Developer Friendly =
@@ -94,6 +124,49 @@ The translations are handled on WordPress.org. Please be part of the community a
 * Features (feature)
 * Categories (listing-category)
 
+== Import Example Data ==
+
+We provide you with a complete set of sample data of listings, including media files. For installation instructions, please follow our [detailed documentation].(https://docs.wpcasa.com/article/import-example-data/)
+
+== What's Next ==
+
+Other useful [free add-ons](https://wordpress.org/plugins/search/WPCasa/) for WPCasa
+
+WPCasa Advanced Search
+WPCasa All Import
+WPCasa Contact Form 7
+WPCasa Gravity Forms
+WPCasa Listings Map
+WPCasa Ninja Forms
+WPCasa Polylang
+WPCasa Pricing Tables
+WPCasa List Agents
+WPCasa Migration Tool (NEW)
+
+More useful [Pro add-ons](https://wpcasa.com/downloads/category/add-ons/) for WPCasa
+
+WPCasa Dashboard
+WPCasa Listing PDF
+WPCasa Featured Listings
+WPCasa Listing Labels
+WPCasa Favorites
+WPCasa Currency Converter
+WPCasa Expire Listings
+WPCasa Energy Efficiency (NEW)
+WPCasa Mortgage Calculator (NEW)
+
+= WPCasa Native Themes =
+
+Check out our [WPCasa themes](https://wpcasa.com/downloads/category/themes/) for your real estate website:
+
+upTown Real Estate (free)
+WPCasa Madrid
+WPCasa Oslo
+WPCasa London
+WPCasa Sylt
+WPCasa Bahia
+WPCasa Elviria
+
 == Installation ==
 
 = Automatic Installation =
@@ -111,40 +184,6 @@ If you prefer to install the plugin manually, you need to download it to your lo
 Once you have installed and activated WPCasa you will find a new page called "Listings" with the `[wpsight_listings]` shortcode. Add your listings on _WP-Admin > Listings > Add New, and they will be listed on that page.
 
 For more information about how to get started please [read our documentation](https://docs.wpsight.com/).
-
-= What's Next =
-
-Other useful [free add-ons](https://wordpress.org/plugins/search/WPCasa/) for WPCasa
-
-WPCasa Advanced Search
-WPCasa All Import
-WPCasa Contact Form 7
-WPCasa Gravity Forms
-WPCasa Listings Map
-WPCasa Ninja Forms
-WPCasa Polylang
-WPCasa Pricing Tables
-WPCasa Migration Tool (NEW)
-
-More useful [Pro add-ons](https://wpcasa.com/downloads/category/add-ons/) for WPCasa
-
-WPCasa Dashboard
-WPCasa Listing PDF
-WPCasa Featured Listings
-WPCasa Listing Labels
-WPCasa Favorites
-WPCasa Currency Converter
-WPCasa Expire Listings
-WPCasa Energy Efficiency (NEW)
-
-Check out our [WPCasa themes](https://wpcasa.com/downloads/category/themes/) for your real estate website:
-
-WPCasa Madrid
-WPCasa Oslo
-WPCasa London
-WPCasa Sylt
-WPCasa Bahia
-WPCasa Elviria
 
 == Frequently Asked Questions ==
 
@@ -216,7 +255,7 @@ Many thanks to all of them for contributing and making WPCasa even better.
 [Kybernetik Services](https://www.kybernetik-services.com/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=wpcasa&utm_content=readme)
 [Joe Hana](https://wordpress.org/support/users/joehana/)
 [Fabian Marz](https://github.com/fabianmarz)
-[codestylist](https://wordpress.org/support/users/codestylist/)
+[mistercode](https://wordpress.org/support/users/mistercode/)
 [Luiz Bills](https://github.com/luizbills)
 [Walter Barcelos](https://walterbarcelos.com)
 [Leonardo Lima de Vasconcellos](https://www.devhouse.com.br/)
@@ -231,6 +270,20 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.0 =
+* NEW: Added the option to also delete the listings media files when a listing is deleted.
+* NEW: Added an admin notice for outdated WPCasa themes that require an update to keep the single listing location output working.
+* NEW: Added an admin notice inviting users to [review WPCasa](https://wordpress.org/plugins/wpcasa/#reviews) on WordPress.org.
+* NEW: Added helpful links to the plugin row meta on the plugins overview screen.
+* NEW: Added new logo.
+* FIX: Added WPCasa user roles on activation and remove them on deactivation.
+* TWEAK: Changed call of itemscope itemtype from http to https
+* TWEAK: Load Google Maps API only when an API key is available.
+* TWEAK: Improved Google Maps API loading with async callback handling for listing maps.
+* TWEAK: Improved message handling for discontinued WPCasa add-ons.
+* TWEAK: Introduced uninstall.php to remove all WPCasa data when uninstalling the plugin.
+* TWEAK: Improved PHP 8 compatibility.
+
 = 1.4.3 =
 * FIX: Not showing message when no listing available (thanks to @DAnn2012 on github)
 * TWEAK: Badge for new add-ons on add-on page
@@ -440,6 +493,9 @@ Andrea Manzato
 * Initial release
 
 == Upgrade Notice ==
+= 1.5.0 =
+Recommended update with a new feature to delete listing media files when removing a listing, improved Google Maps API loading, and safer role setup on activation and deactivation.
+
 = 1.4.1 =
 With this version we are starting to add basic compatibility with block editor (aka Gutenberg). It includes also new REST API endpoints for listings and all associated taxonomies. You can control this new feature on the settings page.
 In addition, we have renamed Twitter to X to match the official wording and we have fixed an issue on the license page.

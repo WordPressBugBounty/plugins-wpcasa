@@ -44,13 +44,18 @@ class WPSight_Admin {
 		
         add_action( 'admin_menu',								[ $this, 'admin_menu' ], 12 );
         add_action( 'admin_enqueue_scripts',					[ $this, 'admin_enqueue_scripts' ] );
+        add_action( 'admin_init',								array( $this, 'maybe_set_review_notice_timestamp' ) );
 
         add_action( 'admin_notices',							[ $this, 'notice_setup' ] );
 	    add_action( 'admin_notices',							[ $this, 'notice_updater' ] );
+        add_action( 'admin_notices',							array( $this, 'notice_review' ) );
+        add_action( 'admin_notices',							array( $this, 'notice_theme_update_required' ) );
+        add_action( 'wp_ajax_wpsight_dismiss_review_notice',	array( $this, 'dismiss_review_notice' ) );
 
         add_filter( 'views_upload',								[ $this, 'media_custom_views' ] );
         add_filter( 'views_edit-listing',						[ $this, 'listings_custom_views' ] );
         add_filter( 'views_edit-property',						[ $this, 'listings_custom_views' ] );
+        add_filter( 'plugin_row_meta',							array( $this, 'plugin_row_meta' ), 10, 2 );
         add_filter( 'manage_users_columns',						[ $this, 'manage_users_columns' ] );
         add_action( 'manage_users_custom_column',				[ $this, 'manage_users_custom_column' ], 10, 3 );
 		
@@ -92,14 +97,14 @@ class WPSight_Admin {
 		wp_enqueue_style( 'wpsight-admin-swiper', WPSIGHT_PLUGIN_URL . '/vendor/swiper/swiper-bundle' . $suffix . '.css', array( 'cmb2-styles' ), '6.7.5' );
 		wp_enqueue_script( 'wpsight-admin-swiper', WPSIGHT_PLUGIN_URL . '/vendor/swiper/swiper-bundle' . $suffix . '.js', array( 'jquery' ), '6.7.5', true );
 
-        wp_enqueue_style( 'wpsight-font', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin-font' . $suffix . '.css', null, WPSIGHT_VERSION );
+	    wp_enqueue_style( 'wpsight-admin', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin' . $suffix . '.css', array(), WPSIGHT_VERSION );
 
-        if ( in_array( $screen->id, array( 'edit-' . $post_type, $post_type, 'toplevel_page_wpsight-settings', 'wpcasa_page_wpsight-addons', 'wpcasa_page_wpsight-themes', 'wpcasa_page_wpsight-licenses', 'wpcasa_page_wpsight-recommendations', 'wpcasa_page_wpsight-about' ) ) || $screen->id == 'plugin-install' && isset( $_GET['tab'] ) && $_GET['tab'] == 'wpcasa_addons' ) {
+	    if ( in_array( $screen->id, array( 'edit-' . $post_type, $post_type, 'toplevel_page_wpsight-settings', 'wpcasa_page_wpsight-addons', 'wpcasa_page_wpsight-themes', 'wpcasa_page_wpsight-licenses', 'wpcasa_page_wpsight-recommendations', 'wpcasa_page_wpsight-about' ) ) || $screen->id == 'plugin-install' && isset( $_GET['tab'] ) && $_GET['tab'] == 'wpcasa_addons' ) {
 
             wp_register_script( 'jquery-tiptip', WPSIGHT_PLUGIN_URL . '/assets/js/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), '1.3', true );
 			
             wp_enqueue_style( 'wpsight-admin-ui-framework', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin-ui-framework' . $suffix . '.css', array( 'cmb2-styles' ), WPSIGHT_VERSION );
-            wp_enqueue_style( 'wpsight-admin', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin' . $suffix . '.css', array( 'wpsight-admin-ui-framework', 'cmb2-styles' ), WPSIGHT_VERSION );
+            wp_enqueue_style( 'wpsight-listing-admin', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-listing-admin' . $suffix . '.css', array( 'wpsight-admin-ui-framework', 'cmb2-styles' ), WPSIGHT_VERSION );
 
 	        wp_enqueue_style('wp-color-picker');
 
@@ -134,7 +139,10 @@ class WPSight_Admin {
      */
     public function admin_menu() {
 
-        add_menu_page( WPSIGHT_NAME, WPSIGHT_NAME, 'manage_options', 'wpsight-settings', [ $this->settings_page, 'output' ], 'dashicons-marker' );
+		// WPCasa logo
+	    $icon_base64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNi42NjciIGhlaWdodD0iMjYuNjY3IiB2aWV3Qm94PSIwIDAgMjAgMjAiPjxwYXRoIGQ9Ik0xNy42NCAwSC4zNkEuMzYuMzYgMCAwIDAgMCAuMzZ2MTcuMjhjMCAuMTk5LjE2MS4zNi4zNi4zNmgxNy4yOGEuMzYuMzYgMCAwIDAgLjM2LS4zNlYuMzZhLjM2LjM2IDAgMCAwLS4zNi0uMzZNMy4xMjMgMTQuMDEzdi02LjJjMC0uMjY5LjEyNS0uNTIyLjMzOC0uNjg2TDguNDc1IDMuMjlhLjg2NC44NjQgMCAwIDEgMS4wNSAwbDUuMDE0IDMuODM3YS44Ni44NiAwIDAgMSAuMzM4LjY4NnY2LjJhLjg2NC44NjQgMCAwIDEtLjg2NC44NjRIMy45ODdhLjg2NC44NjQgMCAwIDEtLjg2NC0uODY0IiBzdHlsZT0iZmlsbDojZjBmMGYxIi8+PHBhdGggZD0iTTkuNTIgOC41MjdjLTEuNjU4LS4wODYtMi4xNjIgMS45Ny0xLjYxOSAzLjIxNi40MzIgMS4xNDIgMS44NDMgMS4xMjYgMi44MzYuNzg4di41MTdjLTUuMTQgMS43MDgtNC43NjctNi43NzYuMTg4LTQuNzQ5bC0uMjM3LjUwNGMtLjM1OC0uMTYtLjc1LS4yODItMS4xNjctLjI3NiIgc3R5bGU9ImZpbGw6I2YwZjBmMSIvPjwvc3ZnPg==";
+
+        add_menu_page( WPSIGHT_NAME, WPSIGHT_NAME, 'manage_options', 'wpsight-settings', [ $this->settings_page, 'output' ], 'data:image/svg+xml;base64,' . $icon_base64 );
 
         add_submenu_page(  'wpsight-settings', WPSIGHT_NAME . ' ' . __( 'Settings', 'wpcasa' ),  __( 'Settings', 'wpcasa' ) , 'manage_options', 'wpsight-settings', [ $this->settings_page, 'output' ] );
 
@@ -150,6 +158,52 @@ class WPSight_Admin {
         if ( apply_filters( 'wpsight_show_about_page', true ) )
             add_submenu_page(  'wpsight-settings', WPSIGHT_NAME . ' ' . __( 'About', 'wpcasa' ),  __( 'About', 'wpcasa' ) , 'manage_options', 'wpsight-about', [ $this, 'about_page' ] );
 		
+    }
+
+    /**
+     * plugin_row_meta()
+     *
+     * Add support and review links on the plugins overview page.
+     *
+     * @param array  $links Existing plugin meta links.
+     * @param string $file Plugin file path.
+     * @uses plugin_basename()
+     * @uses esc_url()
+     * @uses esc_attr__()
+     * @uses esc_html__()
+     * @return array Updated plugin meta links.
+     *
+     * @since 1.5.0
+     */
+    public function plugin_row_meta( $links, $file ) {
+
+        if ( plugin_basename( WPSIGHT_PLUGIN_DIR . '/wpcasa.php' ) !== $file ) {
+            return $links;
+        }
+
+        $custom_links = array(
+            'support' => sprintf(
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer" title="%2$s">%3$s</a>',
+                esc_url( 'https://wordpress.org/support/plugin/wpcasa/' ),
+                esc_attr__( 'Get support for WPCasa', 'wpcasa' ),
+                esc_html__( 'Support', 'wpcasa' )
+            ),
+            'docs' => sprintf(
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer" title="%2$s">%3$s</a>',
+                esc_url( 'https://docs.wpcasa.com/' ),
+                esc_attr__( 'Documentation for WPCasa', 'wpcasa' ),
+                esc_html__( 'Docs', 'wpcasa' )
+            ),
+            'review'  => sprintf(
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer" title="%2$s">%3$s <span class="wpsight-plugin-row-meta-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></a>',
+                esc_url( 'https://wordpress.org/support/plugin/wpcasa/reviews/#new-post' ),
+                esc_attr__( 'Rate WPCasa on WordPress.org', 'wpcasa' ),
+                esc_html__( 'Rate the plugin', 'wpcasa' )
+            ),
+        );
+
+        return array_merge( $links, $custom_links );
+
     }
 
     /**
@@ -202,6 +256,88 @@ class WPSight_Admin {
     public function about_page() {
         $about = include WPSIGHT_PLUGIN_DIR . '/includes/admin/class-wpsight-admin-page-about.php';
         $about->output();
+    }
+
+    /**
+     * Get the outdated bundled WPCasa theme data if an update is required.
+     *
+     * @return array|false
+     */
+    protected function get_outdated_wpcasa_theme_data() {
+
+        $theme          = wp_get_theme();
+        $minimum_versions = array(
+            'wpcasa-oslo'   => '1.4.1',
+            'wpcasa-madrid' => '1.5.1',
+            'wpcasa-london' => '1.5.1',
+        );
+        $themes_to_check = array(
+            array(
+                'slug'  => $theme->get_stylesheet(),
+                'theme' => $theme,
+            ),
+        );
+        $parent_theme    = $theme->parent();
+
+        if ( $parent_theme instanceof WP_Theme ) {
+            $themes_to_check[] = array(
+                'slug'  => $theme->get_template(),
+                'theme' => $parent_theme,
+            );
+        }
+
+        foreach ( $themes_to_check as $theme_data ) {
+            if ( empty( $minimum_versions[ $theme_data['slug'] ] ) ) {
+                continue;
+            }
+
+            if ( version_compare( $theme_data['theme']->get( 'Version' ), $minimum_versions[ $theme_data['slug'] ], '<' ) ) {
+                return array(
+                    'name'            => $theme_data['theme']->get( 'Name' ),
+                    'current_version' => $theme_data['theme']->get( 'Version' ),
+                    'required_version'=> $minimum_versions[ $theme_data['slug'] ],
+                );
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Display a notice when an outdated bundled WPCasa theme is active.
+     *
+     * @return void
+     */
+    public function notice_theme_update_required() {
+        $theme_data = false;
+
+        if ( ! current_user_can( 'update_themes' ) ) {
+            return;
+        }
+
+        $theme_data = $this->get_outdated_wpcasa_theme_data();
+
+        if ( false === $theme_data ) {
+            return;
+        }
+
+        echo '<div class="notice notice-warning">';
+        echo '<p>';
+        echo wp_kses_post(
+            sprintf(
+                __(
+                    '<strong>Theme update required:</strong> Please update %1$s from version %2$s to at least version %3$s so that the location output on the single listing page continues to work correctly.',
+                    'wpcasa'
+                ),
+                esc_html( $theme_data['name'] ),
+                esc_html( $theme_data['current_version'] ),
+                esc_html( $theme_data['required_version'] )
+            )
+        );
+        echo '</p>';
+        echo '</div>';
+
     }
 
     /**
@@ -374,14 +510,30 @@ class WPSight_Admin {
 		    'default'	=> '0'
 	    );
 
-	    $options_listings['heading_currency'] = array(
-            'name'		=> __( 'Currency', 'wpcasa' ),
-            'id'		=> 'heading_currency',
-            'position'	=> 80,
-            'type'		=> 'heading'
-        );
+	    $options_listings['heading_media'] = array(
+		    'name'		=> __( 'Media Files', 'wpcasa' ),
+		    'id'		=> 'heading_media',
+		    'position'	=> 78,
+		    'type'		=> 'heading'
+	    );
 
-        $options_listings['currency'] = array(
+	    $options_listings['listings_delete_media'] = array(
+		    'name'		=> __( 'Delete image when the listing is deleted', 'wpcasa' ),
+		    'desc'		=> __( 'Please check the box to delete the listings gallery images and featured image from the WordPress media library when a listing is deleted. <b><u>Please note that file deletion cannot be undone.</u></b>', 'wpcasa' ),
+		    'id'		=> 'listings_delete_media',
+		    'position'	=> 79,
+		    'type'		=> 'checkbox',
+		    'default'	=> '0'
+	    );
+
+	    $options_listings['heading_currency'] = array(
+		    'name'		=> __( 'Currency', 'wpcasa' ),
+		    'id'		=> 'heading_currency',
+		    'position'	=> 80,
+		    'type'		=> 'heading'
+	    );
+
+	    $options_listings['currency'] = array(
             'name'		=> __( 'Currency', 'wpcasa' ),
             'desc'		=> __( 'Please select the currency for the listing prices. If your currency is not listed, please select <code>Other</code>.', 'wpcasa' ),
             'id'		=> 'currency',
@@ -869,6 +1021,230 @@ class WPSight_Admin {
 //        return false;
 //
 //    }
+
+    /**
+     * maybe_set_review_notice_timestamp()
+     *
+     * Make sure the review notice timestamp exists.
+     * This keeps older installations compatible.
+     *
+     * @uses get_option()
+     * @uses current_time()
+     * @uses update_option()
+     * @return void
+     *
+     * @since 1.5.0
+     */
+    public function maybe_set_review_notice_timestamp() {
+
+        $options = get_option( WPSIGHT_DOMAIN, array() );
+
+        if ( ! is_array( $options ) ) {
+            $options = array();
+        }
+
+        if ( ! empty( $options['review_notice_timestamp'] ) ) {
+            return;
+        }
+
+        $options['review_notice_timestamp'] = current_time( 'timestamp' );
+
+        update_option( WPSIGHT_DOMAIN, $options );
+
+    }
+
+    /**
+     * should_show_review_notice()
+     *
+     * Check if the review notice should be displayed.
+     *
+     * @uses current_user_can()
+     * @uses get_current_user_id()
+     * @uses get_user_meta()
+     * @uses wpsight_get_option()
+     * @uses current_time()
+     * @return bool True if the notice should be shown.
+     *
+     * @since 1.5.0
+     */
+    protected function should_show_review_notice() {
+
+        $timestamp = absint( wpsight_get_option( 'review_notice_timestamp', false ) );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return false;
+        }
+
+        if ( get_user_meta( get_current_user_id(), 'wpsight_review_notice_dismissed', true ) ) {
+            return false;
+        }
+
+        if ( empty( $timestamp ) ) {
+            return false;
+        }
+
+        return current_time( 'timestamp' ) >= ( $timestamp + ( 7 * DAY_IN_SECONDS ) );
+
+    }
+
+    /**
+     * get_review_notice_recipient_name()
+     *
+     * Get the current user's name for the review notice.
+     * Use first name and last name when available.
+     * Fall back to display name when first name is empty.
+     *
+     * @uses wp_get_current_user()
+     * @return string Recipient name.
+     *
+     * @since 1.5.0
+     */
+    protected function get_review_notice_recipient_name() : string {
+
+        $current_user = wp_get_current_user();
+        $first_name   = isset( $current_user->first_name ) ? trim( $current_user->first_name ) : '';
+        $display_name = isset( $current_user->display_name ) ? trim( $current_user->display_name ) : '';
+
+        if ( empty( $first_name ) ) {
+            return $display_name;
+        }
+
+        return $first_name;
+
+    }
+
+    /**
+     * notice_review()
+     *
+     * Show the review notice after the waiting period has passed.
+     *
+     * @uses self::should_show_review_notice()
+     * @uses esc_url()
+     * @uses esc_attr__()
+     * @uses esc_html__()
+     * @uses wp_create_nonce()
+     * @uses wp_kses()
+     * @return void
+     *
+     * @since 1.5.0
+     */
+    public function notice_review() {
+
+        if ( ! $this->should_show_review_notice() ) {
+            return;
+        }
+
+        $review_url = 'https://wordpress.org/plugins/wpcasa/#reviews';
+        $image_url  = WPSIGHT_PLUGIN_URL . '/assets/img/icon.png';
+        $user_name  = '<b>' . esc_html__( $this->get_review_notice_recipient_name() ) . '</b>' ;
+        $stars_link = sprintf(
+            '<a href="%1$s" target="_blank" rel="noopener noreferrer" class="wpsight-review-notice__text-link wpsight-review-notice__stars" aria-label="%2$s">&#9733;&#9733;&#9733;&#9733;&#9733;</a>',
+            esc_url( $review_url ),
+            esc_attr__( 'Rate WPCasa on WordPress.org', 'wpcasa' )
+        );
+        $wporg_link = sprintf(
+            '<a href="%1$s" target="_blank" rel="noopener noreferrer" class="wpsight-review-notice__text-link">%2$s</a>',
+            esc_url( $review_url ),
+            esc_html__( 'WordPress.org', 'wpcasa' )
+        );
+        $message    = sprintf(
+            wp_kses(
+                __( 'Hi %1$s, you have used this free plugin for some time now, and we hope you like it!<br>The contributors of WPCasa have spent countless hours developing it, and it would mean a lot to us if you could rate WPCasa %2$s on %3$s to help us spread the word.<br>It costs you nothing but helps us a lot. We really appreciate your time!', 'wpcasa' ),
+                array(
+                    'a'      => array(
+                        'aria-label' => array(),
+                        'class'      => array(),
+                        'href'       => array(),
+                        'rel'        => array(),
+                        'target'     => array(),
+                    ),
+                    'b' => array(),
+                    'br' => array(),
+                )
+            ),
+            $user_name,
+            $stars_link,
+            $wporg_link
+        );
+
+        echo '<div class="notice notice-info is-dismissible wpsight-review-notice" data-nonce="' . esc_attr( wp_create_nonce( 'wpsight_dismiss_review_notice' ) ) . '">';
+        echo '<div class="wpsight-review-notice__inner">';
+        echo '<div class="wpsight-review-notice__media">';
+        echo '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'WPCasa', 'wpcasa' ) . '" class="wpsight-review-notice__image" />';
+        echo '</div>';
+        echo '<div class="wpsight-review-notice__content">';
+        echo '<p class="wpsight-review-notice__text">' . $message . '</p>';
+        echo '<p class="wpsight-review-notice__actions">';
+        echo '<a href="' . esc_url( $review_url ) . '" target="_blank" rel="noopener noreferrer" class="wpsight-review-notice__button"><span class="wpsight-review-notice__button-icon wpsight-review-notice__button-icon-star">&#9733;</span>' . esc_html__( 'Review WPCasa', 'wpcasa' ) . '</a>';
+        echo '<button type="button" class="wpsight-review-notice__button wpsight-review-notice__button-dismiss"><span class="wpsight-review-notice__button-icon wpsight-review-notice__button-icon-close">&#x2705;</span>' . esc_html__( "I've already done it", 'wpcasa' ) . '</button>';
+        echo '</p>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+
+        ?>
+        <script>
+            jQuery( function( $ ) {
+                var $notice = $( '.wpsight-review-notice' );
+                var dismissNotice = function() {
+                    $.post(
+                        ajaxurl,
+                        {
+                            action: 'wpsight_dismiss_review_notice',
+                            nonce: $notice.data( 'nonce' )
+                        }
+                    );
+                };
+
+                if ( ! $notice.length ) {
+                    return;
+                }
+
+                $notice.on( 'click', '.notice-dismiss', function() {
+                    dismissNotice();
+                } );
+
+                $notice.on( 'click', '.wpsight-review-notice__button-dismiss', function() {
+                    dismissNotice();
+                    $notice.fadeOut( 180, function() {
+                        $notice.remove();
+                    } );
+                } );
+            } );
+        </script>
+        <?php
+
+    }
+
+    /**
+     * dismiss_review_notice()
+     *
+     * Save the dismiss state for the current user.
+     *
+     * @uses current_user_can()
+     * @uses check_ajax_referer()
+     * @uses get_current_user_id()
+     * @uses current_time()
+     * @uses update_user_meta()
+     * @uses wp_send_json_error()
+     * @uses wp_send_json_success()
+     * @return void
+     *
+     * @since 1.5.0
+     */
+    public function dismiss_review_notice() {
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error();
+        }
+
+        check_ajax_referer( 'wpsight_dismiss_review_notice', 'nonce' );
+
+        update_user_meta( get_current_user_id(), 'wpsight_review_notice_dismissed', current_time( 'timestamp' ) );
+
+        wp_send_json_success();
+
+    }
 
     /**
      *	notice_setup()
