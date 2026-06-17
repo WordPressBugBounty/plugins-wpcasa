@@ -6,7 +6,7 @@ Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
 Tested up to: 7.0
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,7 +126,7 @@ The translations are handled on WordPress.org. Please be part of the community a
 
 == Import Example Data ==
 
-We provide you with a complete set of sample data of listings, including media files. For installation instructions, please follow our [detailed documentation].(https://docs.wpcasa.com/article/import-example-data/)
+We provide you with a complete set of sample data of listings, including media files. For installation instructions, please follow our [detailed documentation](https://docs.wpcasa.com/article/import-example-data/).
 
 == What's Next ==
 
@@ -222,7 +222,7 @@ We do not use any third Party providers or external services, but on the backend
 = Why do you use external services?  =
 
 We do call Google Maps when you view the listing map where we have placed the listings on it. For this you have to add your Google Maps key.
-We call (goqr.me)[https://goqr.me/] when you print a listing. This service allows us to add a QR code on the last page.
+We call [goqr.me](https://goqr.me/) when you print a listing. This service allows us to add a QR code on the last page.
 
 = Where is the *.pot file for translating the plugin in any language? =
 
@@ -270,6 +270,12 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.1 =
+* NEW: max_nr attribute for 'wpsight_listings' shortcode to limit listings output without pagination ( check also the [documentation](https://docs.wpcasa.com/article/shortcode-wpsight_listings/) ).
+* FIX: Fixed warning 'open_basedir' restriction when no listing was found.
+* TWEAK: Improved RTL (right-to-left) on WPCasa settings pages in WordPress backend.
+* TWEAK: Added notice when editing agent information on user page.
+
 = 1.5.0 =
 * NEW: Added the option to also delete the listings media files when a listing is deleted.
 * NEW: Added an admin notice for outdated WPCasa themes that require an update to keep the single listing location output working.

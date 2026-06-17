@@ -1,0 +1,70 @@
+/* WPCasa Admin — RTL Layout */
+
+/* --- Core sidebar/main layout flip --- */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar-back,
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar,
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main {
+  transition: margin-right .6s ease;
+}
+
+/* Push main content to the LEFT of the sidebar (which sits at right:0 in RTL) */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main {
+  margin-left: 0;
+  margin-right: 260px;
+}
+
+/* Toggle-navbar states */
+.wpsight-settings-page .wpsight-settings-wrap-hide-navbar .wpsight-admin-sidebar-back,
+.wpsight-settings-page .wpsight-settings-wrap-hide-navbar .wpsight-admin-sidebar {
+  margin-right: 0;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap.wpsight-settings-wrap-hide-navbar .wpsight-admin-main {
+  margin-right: 260px !important;
+  margin-left: 0 !important;
+}
+
+/* --- Remove WP's own right-padding for the admin menu in RTL --- */
+.wpsight-settings-page #wpcontent {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* --- Fix the sidebar arrow colour indicator (points the other way in RTL) --- */
+.wpsight-settings-page ul#adminmenu a.wp-has-current-submenu:after,
+ul#adminmenu > li.current > a.current:after {
+  border-right-color: transparent;
+  border-left-color: #3b4045;
+}
+
+/* --- Fix grid column float direction --- */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-ui-container,
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-ui-grid-col {
+  float: right;
+}
+
+/* --- Flip panel border to the correct side --- */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-ui-panel {
+  border-right: none;
+  border-left: 1px solid #EEE;
+}
+
+/* --- Tab icon spacing --- */
+.wpsight-settings-page .wpsight-settings-wrap .nav-tab-wrapper .nav-tab .dashicons {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
+/* --- Mobile: collapse to the RIGHT instead of the left --- */
+@media (max-width: 600px) {
+  .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar-back,
+  .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar {
+    margin-left: 0;
+    margin-right: -260px;
+  }
+
+  .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main {
+    margin-right: 0 !important;
+    width: 100%;
+  }
+}

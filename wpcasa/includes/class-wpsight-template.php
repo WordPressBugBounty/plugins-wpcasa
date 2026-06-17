@@ -79,7 +79,7 @@ class WPSight_Template {
 				break;
 
 				// Check custom path templates (e.g. from addons)
-			} elseif ( file_exists( trailingslashit( $template_path ) . $template_name ) ) {
+			} elseif ( ! empty( $template_path ) && file_exists( trailingslashit( $template_path ) . $template_name ) ) {
 				$located = trailingslashit( $template_path ) . $template_name;
 				break;
 

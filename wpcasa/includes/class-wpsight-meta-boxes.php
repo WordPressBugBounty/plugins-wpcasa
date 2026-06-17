@@ -835,7 +835,7 @@ class WPSight_Meta_Boxes {
 			'general_title' => array(
 				'id'        => 'general_title',
 				'name'      => __( 'Agent Information', 'wpcasa' ),
-				'desc'		=> __( 'Apart from the default WordPress profile information above you can add additional agent details here.', 'wpcasa' ),
+				'desc'		=> __( 'Apart from the default WordPress profile information above you can add additional agent details here.', 'wpcasa' ) . ' <br><b>' . __( 'Note: Changes are only used for future listings. Existing listings must be updated manually.', 'wpcasa' ) . '</b>',
 				'type'      => 'title',
 				'show_on_cb'=> array( 'WPSight_Meta_Boxes', 'meta_box_field_only_admin' ),
 				'priority'  => 5

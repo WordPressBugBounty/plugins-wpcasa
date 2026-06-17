@@ -105,6 +105,9 @@ class WPSight_Admin {
 			
             wp_enqueue_style( 'wpsight-admin-ui-framework', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin-ui-framework' . $suffix . '.css', array( 'cmb2-styles' ), WPSIGHT_VERSION );
             wp_enqueue_style( 'wpsight-listing-admin', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-listing-admin' . $suffix . '.css', array( 'wpsight-admin-ui-framework', 'cmb2-styles' ), WPSIGHT_VERSION );
+            if ( is_rtl() ) {
+                wp_enqueue_style( 'wpsight-listing-admin-rtl', WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-admin-rtl' . $suffix . '.css', array( 'wpsight-listing-admin' ), WPSIGHT_VERSION );
+            }
 
 	        wp_enqueue_style('wp-color-picker');
 

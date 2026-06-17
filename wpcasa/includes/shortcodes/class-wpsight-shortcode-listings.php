@@ -19,6 +19,7 @@ class WPSight_Shortcode_Listings {
 	 * display listing queries.
 	 *
 	 * @param array $atts Shortcode attributes
+	 * @uses absint()
 	 * @uses wpsight_listing_query_vars()
 	 * @uses wpsight_listings()
 	 * @uses wp_kses_allowed_html()
@@ -33,6 +34,7 @@ class WPSight_Shortcode_Listings {
             'after'				=> '',
             'wrap'	 			=> 'div',
             'offset'			=> '',
+			'max_nr'			=> '',
 			'posts_per_page'	=> get_query_var( 'nr' ) ? get_query_var( 'nr' ) : get_option( 'posts_per_page' ),
 			'orderby'			=> get_query_var( 'orderby' ) ? get_query_var( 'orderby' ) : 'date',
 			'order'				=> get_query_var( 'order' ) ? get_query_var( 'order' ) : 'DESC',
@@ -53,6 +55,15 @@ class WPSight_Shortcode_Listings {
 		
 		$args['show_panel'] = $args['show_panel'] === true || $args['show_panel'] == 'true' ? true : false;
 		$args['show_paging'] = $args['show_paging'] === true || $args['show_paging'] == 'true' ? true : false;
+
+		// Limit listings output without pagination when max_nr is provided.
+		$args['max_nr'] = ! empty( $args['max_nr'] ) ? absint( $args['max_nr'] ) : '';
+
+		if ( ! empty( $args['max_nr'] ) ) {
+			$args['posts_per_page'] = $args['max_nr'];
+			$args['show_paging']    = false;
+			$args['paged']          = 1;
+		}
         
         ob_start();
         

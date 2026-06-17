@@ -15,6 +15,7 @@ class WPSight_Listings {
      *
      * @param array $args Array of query arguments
      * @param string $template_path Template path for wpsight_get_template()
+     * @uses absint()
      * @uses wpsight_get_listings()
      * @uses wpsight_get_template()
      * @uses wpsight_get_template_part()
@@ -24,6 +25,17 @@ class WPSight_Listings {
      */
     public static function listings( $args = array(), $template_path = '' ) {
         global $wpsight_query;
+
+        // Limit listings output without pagination when max_nr is provided.
+        if ( is_array( $args ) ) {
+            $args['max_nr'] = ! empty( $args['max_nr'] ) ? absint( $args['max_nr'] ) : '';
+
+            if ( ! empty( $args['max_nr'] ) ) {
+                $args['posts_per_page'] = $args['max_nr'];
+                $args['show_paging']    = false;
+                $args['paged']          = 1;
+            }
+        }
 
         // Get listings query
         $wpsight_query = wpsight_get_listings( $args );
@@ -66,6 +78,7 @@ class WPSight_Listings {
      *
      * @param array $args Array of query arguments
      * @uses get_query_var()
+     * @uses absint()
      * @uses wpsight_listing_query_vars()
      * @uses wp_parse_args()
      * @uses wpsight_post_type()
@@ -93,6 +106,7 @@ class WPSight_Listings {
             'tax_query'				=> array(),
             'meta_query'			=> array(),
             'ignore_sticky_posts'	=> 1,
+            'max_nr'				=> '',
             'show_panel'			=> true,
             'show_paging'			=> true
         );
@@ -127,6 +141,15 @@ class WPSight_Listings {
         // Make sure nr arg works too
         if ( ! empty( $args['nr'] ) )
             $args['posts_per_page'] = intval( $args['nr'] );
+
+        // Limit listings query without pagination when max_nr is provided.
+        $args['max_nr'] = ! empty( $args['max_nr'] ) ? absint( $args['max_nr'] ) : '';
+
+        if ( ! empty( $args['max_nr'] ) ) {
+            $args['posts_per_page'] = $args['max_nr'];
+            $args['show_paging']    = false;
+            $paged                  = 1;
+        }
 
         // Make sure offset is intval or empty
         $args['offset'] = ! empty( $args['offset'] ) ? absint( $args['offset'] ) : '';
@@ -686,6 +709,33 @@ class WPSight_Listings {
 
         // Return offer key or label
         return apply_filters( 'wpsight_get_listing_offer', $offer, $post_id, $label );
+
+    }
+
+    /**
+     * get_listing_offer_not_available_label()
+     *
+     * Replace the visible offer label when a listing is not available.
+     *
+     * @param string|false $offer   Offer key or label.
+     * @param int          $post_id Listing post ID.
+     * @param bool         $label   Whether the offer label is requested.
+     * @uses wpsight_is_listing_not_available()
+     * @return string|false Offer label or key.
+     *
+     * @since 1.5.1
+     */
+    public static function get_listing_offer_not_available_label( $offer, $post_id, $label ) {
+
+        if ( true !== $label ) {
+            return $offer;
+        }
+
+        if ( wpsight_is_listing_not_available( $post_id ) ) {
+            return apply_filters( 'wpsight_listing_offer_not_available_label', esc_html__( 'Not available', 'wpcasa' ), $post_id, $offer );
+        }
+
+        return $offer;
 
     }
 
@@ -1640,3 +1690,5 @@ class WPSight_Listings {
     }
 
 }
+
+add_filter( 'wpsight_get_listing_offer', array( 'WPSight_Listings', 'get_listing_offer_not_available_label' ), 10, 3 );
