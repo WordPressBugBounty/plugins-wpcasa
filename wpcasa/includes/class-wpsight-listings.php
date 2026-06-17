@@ -713,33 +713,6 @@ class WPSight_Listings {
     }
 
     /**
-     * get_listing_offer_not_available_label()
-     *
-     * Replace the visible offer label when a listing is not available.
-     *
-     * @param string|false $offer   Offer key or label.
-     * @param int          $post_id Listing post ID.
-     * @param bool         $label   Whether the offer label is requested.
-     * @uses wpsight_is_listing_not_available()
-     * @return string|false Offer label or key.
-     *
-     * @since 1.5.1
-     */
-    public static function get_listing_offer_not_available_label( $offer, $post_id, $label ) {
-
-        if ( true !== $label ) {
-            return $offer;
-        }
-
-        if ( wpsight_is_listing_not_available( $post_id ) ) {
-            return apply_filters( 'wpsight_listing_offer_not_available_label', esc_html__( 'Not available', 'wpcasa' ), $post_id, $offer );
-        }
-
-        return $offer;
-
-    }
-
-    /**
      * get_listing_period()
      *
      * Return listings rental period.
@@ -1690,5 +1663,3 @@ class WPSight_Listings {
     }
 
 }
-
-add_filter( 'wpsight_get_listing_offer', array( 'WPSight_Listings', 'get_listing_offer_not_available_label' ), 10, 3 );

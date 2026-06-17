@@ -6,7 +6,7 @@ Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
 Tested up to: 7.0
-Stable tag: 1.5.1
+Stable tag: 1.5.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -270,6 +270,9 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.1.1 =
+* Fix: Revert deployment wrong file
+
 = 1.5.1 =
 * NEW: max_nr attribute for 'wpsight_listings' shortcode to limit listings output without pagination ( check also the [documentation](https://docs.wpcasa.com/article/shortcode-wpsight_listings/) ).
 * FIX: Fixed warning 'open_basedir' restriction when no listing was found.
