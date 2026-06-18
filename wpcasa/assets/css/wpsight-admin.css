@@ -102,3 +102,53 @@
         height: 52px;
     }
 }
+
+/* Translation notice
+================================================== */
+.wpsight-translation-notice.notice-info,
+.wpsight-settings-page .wpsight-translation-notice.notice-info {
+    border-left-color: #43a97b;
+    background: #f0fbf8;
+}
+
+.wpsight-translation-notice .wpsight-review-notice__actions {
+    margin-top: 10px;
+}
+
+.wpsight-translation-notice .wpsight-review-notice__text strong {
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.wpsight-translation-notice .wpsight-review-notice__button:first-child {
+    border-color: #12ae8f;
+    background: #12ae8f;
+    color: #ffffff;
+}
+
+.wpsight-translation-notice .wpsight-review-notice__button:first-child:hover,
+.wpsight-translation-notice .wpsight-review-notice__button:first-child:focus {
+    border-color: #0f8e75;
+    background: #0f8e75;
+    color: #ffffff;
+}
+
+.wpsight-translation-notice__button-icon-translate.dashicons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.wpsight-translation-notice__button-icon-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    background: #d63638;
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 14px;
+}

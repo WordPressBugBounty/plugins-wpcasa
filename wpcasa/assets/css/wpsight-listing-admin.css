@@ -2131,6 +2131,17 @@ ul#adminmenu>li.current>a.current:after {
     border-left: 5px solid rgb(0, 160, 210);
 }
 
+.wpsight-settings-page .wpsight-review-notice.notice-info,
+.wpsight-settings-page .wpsight-translation-notice.notice-info {
+    background-color: #ffffff;
+    border-left-color: #43a97b;
+    line-height: 1.45;
+}
+
+.wpsight-settings-page .wpsight-translation-notice.notice-info {
+    background-color: #f0fbf8;
+}
+
 
 
 

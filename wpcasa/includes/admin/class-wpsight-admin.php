@@ -15,6 +15,7 @@ class WPSight_Admin {
     public $license_page;
     public $color_scheme;
     public $helpers;
+    public $translation_notice;
 
 
     /**
@@ -31,6 +32,7 @@ class WPSight_Admin {
         include_once WPSIGHT_PLUGIN_DIR . '/includes/admin/class-wpsight-admin-page-licenses.php';
         include_once WPSIGHT_PLUGIN_DIR . '/includes/admin/class-wpsight-admin-color-scheme.php';
         include_once WPSIGHT_PLUGIN_DIR . '/includes/admin/class-wpsight-admin-helpers.php';
+        include_once WPSIGHT_PLUGIN_DIR . '/includes/admin/class-wpsight-admin-translation-notice.php';
 
 		// Load classes
         $this->cpt				= new WPSight_Admin_CPT();
@@ -39,12 +41,34 @@ class WPSight_Admin {
         $this->license_page		= new WPSight_Admin_Licenses();
         $this->color_scheme		= new WPSight_Admin_Color_Scheme();
         $this->helpers			= new WPSight_Admin_Helpers();
+        $this->translation_notice	= new WPSight_Admin_Translation_Notice(
+            array(
+                'textdomain'       => 'wpcasa',
+                'project_slug'     => 'wpcasa',
+                'plugin_name'      => WPSIGHT_NAME,
+                'notice_id'        => 'wpsight_translation_notice',
+                'logo_url'         => WPSIGHT_PLUGIN_URL . '/assets/img/icon.png',
+                'minimum_percent'  => 90,
+                'translation_url'  => 'https://translate.wordpress.org/projects/wp-plugins/wpcasa/',
+                'screens'          => array(
+                    'plugins',
+                    'toplevel_page_wpsight-settings',
+                    'wpcasa_page_wpsight-addons',
+                    'wpcasa_page_wpsight-themes',
+                    'wpcasa_page_wpsight-licenses',
+                    'wpcasa_page_wpsight-recommendations',
+                ),
+            )
+        );
 
 		// Actions & Filers
 		
         add_action( 'admin_menu',								[ $this, 'admin_menu' ], 12 );
         add_action( 'admin_enqueue_scripts',					[ $this, 'admin_enqueue_scripts' ] );
+        add_action( 'upgrader_process_complete',				array( $this, 'maybe_set_update_page_redirect' ), 10, 2 );
+        add_action( 'admin_init',								array( $this, 'maybe_redirect_to_update_page' ) );
         add_action( 'admin_init',								array( $this, 'maybe_set_review_notice_timestamp' ) );
+        add_action( 'admin_footer-update.php',					array( $this, 'maybe_print_update_page_redirect_script' ) );
 
         add_action( 'admin_notices',							[ $this, 'notice_setup' ] );
 	    add_action( 'admin_notices',							[ $this, 'notice_updater' ] );
@@ -91,8 +115,20 @@ class WPSight_Admin {
         $post_type	= wpsight_post_type();
 
 		// TODO: Delete it till wpcasa 1.7
-        if ( in_array( $screen->id, array( 'plugins' ) ) )
-            wp_enqueue_script( 'jquery-plugins-admin', WPSIGHT_PLUGIN_URL . '/assets/js/wpsight-plugins-admin.js', array( 'jquery' ), WPSIGHT_VERSION, true );
+        if ( in_array( $screen->id, array( 'plugins' ), true ) ) {
+            wp_enqueue_script( 'jquery-plugins-admin', WPSIGHT_PLUGIN_URL . '/assets/js/wpsight-plugins-admin' . $suffix . '.js', array( 'jquery' ), WPSIGHT_VERSION, true );
+
+            wp_add_inline_script(
+                'jquery-plugins-admin',
+                'var wpsightPluginsAdmin = ' . wp_json_encode(
+                    array(
+                        'pluginFile'    => plugin_basename( WPSIGHT_PLUGIN_DIR . '/wpcasa.php' ),
+                        'updatePageUrl' => admin_url( 'admin.php?page=wpsight-about' ),
+                    )
+                ) . ';',
+                'before'
+            );
+        }
 
 		wp_enqueue_style( 'wpsight-admin-swiper', WPSIGHT_PLUGIN_URL . '/vendor/swiper/swiper-bundle' . $suffix . '.css', array( 'cmb2-styles' ), '6.7.5' );
 		wp_enqueue_script( 'wpsight-admin-swiper', WPSIGHT_PLUGIN_URL . '/vendor/swiper/swiper-bundle' . $suffix . '.js', array( 'jquery' ), '6.7.5', true );
@@ -206,6 +242,168 @@ class WPSight_Admin {
         );
 
         return array_merge( $links, $custom_links );
+
+    }
+
+    /**
+     * maybe_set_update_page_redirect()
+     *
+     * Mark the current user for a one-time redirect after an individual WPCasa update.
+     *
+     * @param WP_Upgrader $upgrader   Upgrader instance.
+     * @param array       $hook_extra Update context data.
+     * @uses current_user_can()
+     * @uses plugin_basename()
+     * @uses update_user_meta()
+     * @uses get_current_user_id()
+     * @return void
+     *
+     * @since 1.5.3
+     */
+    public function maybe_set_update_page_redirect( $upgrader, $hook_extra ) {
+
+        if ( ! current_user_can( 'update_plugins' ) ) {
+            return;
+        }
+
+        if ( wp_doing_ajax() ) {
+            return;
+        }
+
+        if ( empty( $hook_extra['action'] ) || 'update' !== $hook_extra['action'] ) {
+            return;
+        }
+
+        if ( empty( $hook_extra['type'] ) || 'plugin' !== $hook_extra['type'] ) {
+            return;
+        }
+
+        if ( isset( $upgrader->skin->result ) && ( false === $upgrader->skin->result || is_wp_error( $upgrader->skin->result ) ) ) {
+            return;
+        }
+
+        $plugin_file = plugin_basename( WPSIGHT_PLUGIN_DIR . '/wpcasa.php' );
+
+        if ( ! $this->is_individual_wpcasa_update( $hook_extra, $plugin_file ) ) {
+            return;
+        }
+
+        update_user_meta( get_current_user_id(), '_wpsight_update_page_redirect', WPSIGHT_VERSION );
+
+    }
+
+    /**
+     * is_individual_wpcasa_update()
+     *
+     * Check if the update context contains WPCasa as the only updated plugin.
+     *
+     * @param array  $hook_extra Update context data.
+     * @param string $plugin_file WPCasa plugin basename.
+     * @return bool True when WPCasa was updated individually.
+     *
+     * @since 1.5.3
+     */
+    protected function is_individual_wpcasa_update( $hook_extra, $plugin_file ) {
+
+        if ( ! empty( $hook_extra['plugin'] ) ) {
+            return $plugin_file === $hook_extra['plugin'];
+        }
+
+        if ( empty( $hook_extra['plugins'] ) || ! is_array( $hook_extra['plugins'] ) ) {
+            return false;
+        }
+
+        $plugins = array_values( array_filter( $hook_extra['plugins'] ) );
+
+        return 1 === count( $plugins ) && $plugin_file === $plugins[0];
+
+    }
+
+    /**
+     * maybe_redirect_to_update_page()
+     *
+     * Redirect the current user once to the WPCasa update information page.
+     *
+     * @uses current_user_can()
+     * @uses get_current_user_id()
+     * @uses get_user_meta()
+     * @uses delete_user_meta()
+     * @uses admin_url()
+     * @uses wp_safe_redirect()
+     * @return void
+     *
+     * @since 1.5.3
+     */
+    public function maybe_redirect_to_update_page() {
+
+        if ( wp_doing_ajax() || wp_doing_cron() || is_network_admin() ) {
+            return;
+        }
+
+        if ( ! current_user_can( 'update_plugins' ) ) {
+            return;
+        }
+
+        $user_id = get_current_user_id();
+
+        if ( ! get_user_meta( $user_id, '_wpsight_update_page_redirect', true ) ) {
+            return;
+        }
+
+        delete_user_meta( $user_id, '_wpsight_update_page_redirect' );
+
+        if ( isset( $_GET['page'] ) && 'wpsight-about' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+            return;
+        }
+
+        wp_safe_redirect( admin_url( 'admin.php?page=wpsight-about' ) );
+        exit;
+
+    }
+
+    /**
+     * maybe_print_update_page_redirect_script()
+     *
+     * Redirect from the classic plugin updater screen after a successful WPCasa update.
+     *
+     * @uses current_user_can()
+     * @uses get_current_user_id()
+     * @uses get_user_meta()
+     * @uses delete_user_meta()
+     * @uses admin_url()
+     * @uses wp_json_encode()
+     * @return void
+     *
+     * @since 1.5.3
+     */
+    public function maybe_print_update_page_redirect_script() {
+
+        if ( ! current_user_can( 'update_plugins' ) ) {
+            return;
+        }
+
+        $user_id = get_current_user_id();
+
+        if ( ! get_user_meta( $user_id, '_wpsight_update_page_redirect', true ) ) {
+            return;
+        }
+
+        delete_user_meta( $user_id, '_wpsight_update_page_redirect' );
+
+        ?>
+        <script type="text/javascript">
+            ( function() {
+                var updatePageUrl = <?php echo wp_json_encode( admin_url( 'admin.php?page=wpsight-about' ) ); ?>;
+
+                if ( window.parent && window.parent !== window ) {
+                    window.parent.location.href = updatePageUrl;
+                    return;
+                }
+
+                window.location.href = updatePageUrl;
+            }() );
+        </script>
+        <?php
 
     }
 
