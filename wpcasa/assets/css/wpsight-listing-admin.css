@@ -2315,7 +2315,7 @@ ul#adminmenu>li.current>a.current:after {
 
 .wpsight-settings-page .wpsight-settings-wrap .settings_panel .wpsight-admin-ui-panel .button-text-icon span {
     position: relative;
-    top: 11px;
+    top: 2px;
     margin-right: 5px;
 }
 

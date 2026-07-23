@@ -205,8 +205,13 @@ class WPSight_Helpers {
 		// Get wpSight options
 		$options = get_option( WPSIGHT_DOMAIN );
 
+		// Ensure options can be safely updated as an array.
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
+
 		// Add new option to array
-		$options[$name] = $value;
+		$options[ $name ] = $value;
 
 		// Update option with new array
 		update_option( WPSIGHT_DOMAIN, $options );
@@ -229,10 +234,14 @@ class WPSight_Helpers {
 		// Get wpSight options
 		$options = get_option( WPSIGHT_DOMAIN );
 
-		if ( isset( $options[$name] ) ) {
+		if ( ! is_array( $options ) ) {
+			return;
+		}
+
+		if ( isset( $options[ $name ] ) ) {
 
 			// Remove option from array
-			unset( $options[$name] );
+			unset( $options[ $name ] );
 
 			// Update option with new array
 			update_option( WPSIGHT_DOMAIN, $options );

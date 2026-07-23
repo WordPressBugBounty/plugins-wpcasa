@@ -1,44 +1,44 @@
 <?php
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) )
-	exit;
+    exit;
 
 if ( ! class_exists( 'WPSight_About' ) ) :
 
-/**
- * WPSight_About Class
- */
-class WPSight_About {
+    /**
+     * WPSight_About Class
+     */
+    class WPSight_About {
 
-	/**
-	 * Handles output of the reports page in admin.
-	 */
-	public function output() : void {
+        /**
+         * Handles output of the reports page in admin.
+         */
+        public function output() : void {
 
-		/**
-		 * About This Version administration panel.
-		 *
-		 * @package WPCasa
-		 * @subpackage Administration
-		 */
-		
-		list( $display_version ) = explode( '-', WPSIGHT_VERSION );
-		
-		?>
-        
-			<div class="wpcasa-about wrap full-width-layout">
-                        
-            	<div class="wrap-inner">
-                
-				<a href="https://wpcasa.com" target="_blank" class="wp-badge">
+            /**
+             * About This Version administration panel.
+             *
+             * @package WPCasa
+             * @subpackage Administration
+             */
+
+            list( $display_version ) = explode( '-', WPSIGHT_VERSION );
+
+            ?>
+
+            <div class="wpcasa-about wrap full-width-layout">
+
+            <div class="wrap-inner">
+
+                <a href="https://wpcasa.com" target="_blank" class="wp-badge">
                     <?php
                     /* translators: %s: is the current version */
                     printf( esc_html__( 'Version %s', 'wpcasa' ), esc_html( $display_version ) ); ?></a>
-                
+
                 <section id="section-intro" class="section section-intro">
-                    
+
                     <div class="section-wrap">
-                    
+
                         <div class="intro-text">
                             <h1><?php
                                 /* translators: %s: is the current version */
@@ -46,33 +46,54 @@ class WPSight_About {
                             <p><?php
                                 /* translators: %s: is the current version */
                                 printf( esc_html__( 'Thank you for updating to the latest version! WPCasa %s will smooth your user experience and includes new features and improvements.', 'wpcasa' ), esc_html( $display_version ) ); ?></p>
-                        </div>              
+                        </div>
 
                         <div class="hero-image">
                             <img src="<?php echo esc_url( WPSIGHT_PLUGIN_URL . '/assets/img/wpcasa-update-1.png' ); ?>" />
                         </div>
-                        
+
                     </div>
-                    
+
                 </section>
 
                 <section id="section-changelog" class="section section-changelog">
-                
+
                     <div class="section-wrap">
 
                         <div class="changelog">
-                            
+
                             <h3><?php echo esc_html__( 'Changelog', 'wpcasa' ) ?></h3>
 
                             <ul class="tabs" data-tabgroup="first-tab-group">
-                                <li class="tab"><a href="#version-1-5-2" class="active">v1.5.2</a></li>
+                                <li class="tab"><a href="#version-1-5-3" class="active">v1.5.3</a></li>
+                                <li class="tab"><a href="#version-1-5-2">v1.5.2</a></li>
                                 <li class="tab"><a href="#version-1-5-1">v1.5.1</a></li>
                                 <li class="tab"><a href="#version-1-5-0">v1.5.0</a></li>
-                                <li class="tab"><a href="#version-1-4-3">v1.4.3</a></li>
                                 <li><a href="https://wordpress.org/plugins/wpcasa/#developers" target="_blank"><?php echo esc_html__( 'More', 'wpcasa' ); ?></a></li>
                             </ul>
 
                             <section id="first-tab-group" class="tabgroup">
+                                <div id="version-1-5-3">
+                                    <p>Version: 1.5.3</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Improved handling of plugin option</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Fixed "Automatic conversion of false to array is deprecated in includes/class-wpsight-helpers.php"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Fixed deactivation of WPCasa has affected administrator capabilities</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Fixed icons in WPCasa Admin Dashboard were shifted</td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-5-2">
                                     <p>Version: 1.5.2</p>
                                     <table>
@@ -151,71 +172,37 @@ class WPSight_About {
                                         </tr>
                                     </table>
                                 </div>
-                                <div id="version-1-4-3">
-                                    <p>Version: 1.4.3</p>
-                                    <table>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>Not showing message when no listing is available</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Badge for new add-ons on add-on page</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div id="version-1-4-2">
-                                    <p>Version: 1.4.2</p>
-                                    <table>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Hotfix</span></td>
-                                            <td>Vulnerable to cross site scripting (XSS) with shortcodes 'wpsight_listings_map' reported by Muhammad Yudha - DJ at Patchstack</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Hotfix</span></td>
-                                            <td>Vulnerable to API code injection reported by mikemyers from Wordfence</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>Deprecated message "Creation of dynamic property"</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>"Trying to access array offset on false" on settings page</td>
-                                        </tr>
-                                    </table>
-                                </div>
                             </section>
 
                             <script type="text/javascript">
-                            jQuery(document).ready(function($) {                      
-                                $('.tabgroup > div').hide();
-                                $('.tabgroup > div:first-of-type').show();
-                                $('.tabs .tab a').click(function(e){
-                                    e.preventDefault();
-                                    var $this = $(this),
-                                    tabgroup = '#'+$this.parents('.tabs').data('tabgroup'),
-                                    others = $this.closest('.tab').siblings().children('a'),
-                                    target = $this.attr('href');
-                                    others.removeClass('active');
-                                    $this.addClass('active');
-                                    $(tabgroup).children('div').hide();
-                                    $(target).show();
-                                })
-                            });
+                                jQuery(document).ready(function($) {
+                                    $('.tabgroup > div').hide();
+                                    $('.tabgroup > div:first-of-type').show();
+                                    $('.tabs .tab a').click(function(e){
+                                        e.preventDefault();
+                                        var $this = $(this),
+                                            tabgroup = '#'+$this.parents('.tabs').data('tabgroup'),
+                                            others = $this.closest('.tab').siblings().children('a'),
+                                            target = $this.attr('href');
+                                        others.removeClass('active');
+                                        $this.addClass('active');
+                                        $(tabgroup).children('div').hide();
+                                        $(target).show();
+                                    })
+                                });
                             </script>
 
                         </div>
 
                     </div>
-                    
+
                 </section>
-                    
-			</div>
-		<?php
-		
-	}
-}
+
+            </div>
+            <?php
+
+        }
+    }
 
 endif;
 

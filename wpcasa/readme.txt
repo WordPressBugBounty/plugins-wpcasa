@@ -6,7 +6,7 @@ Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
 Tested up to: 7.0
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -270,6 +270,12 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.3 =
+* TWEAK: Improved handling of plugin option
+* FIX: Fixed "Automatic conversion of false to array is deprecated in includes/class-wpsight-helpers.php"
+* FIX: Deactivation of WPCasa has affected administrator capabilities
+* Fix: Icons in WPCasa Admin Dashboard were shifted
+
 = 1.5.2 =
 * NEW: Added promotional message for translation.
 * TWEAK: Added redirect to about page after an update.

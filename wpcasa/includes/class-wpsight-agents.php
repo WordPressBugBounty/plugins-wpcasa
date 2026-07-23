@@ -93,9 +93,9 @@ class WPSight_Agents {
 
 		$agent_roles = wpsight_agent_roles();
 
-		// Remove listing_admin caps from administrator.
+		// Remove WPCasa related listing_admin caps from administrator
 		foreach ( $agent_roles['listing_admin']['caps'] as $cap => $granted ) {
-			if ( $granted ) {
+			if ( $granted && strpos( $cap, '_listing' ) ) {
 				$wp_roles->remove_cap( 'administrator', $cap );
 			}
 		}
