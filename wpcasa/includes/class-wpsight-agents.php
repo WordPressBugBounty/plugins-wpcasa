@@ -13,6 +13,47 @@ class WPSight_Agents {
 	function __construct() {
 		add_filter( 'pre_get_posts', array( $this, 'author_listings' ) );
 		add_filter( 'get_avatar' , array( $this, 'agent_avatar' ), 1, 5 );
+		add_filter( 'user_has_cap', array( $this, 'allow_agent_own_attachment_deletion' ), 10, 4 );
+	}
+
+	/**
+	 * allow_agent_own_attachment_deletion()
+	 *
+	 * Allow listing agents to delete media files they uploaded themselves.
+	 *
+	 * @param array $allcaps User capabilities.
+	 * @param array $caps    Primitive capabilities required for the requested action.
+	 * @param array $args    Capability check arguments.
+	 * @param WP_User $user  User object.
+	 * @return array Filtered user capabilities.
+	 *
+	 * @since 1.5.4
+	 */
+	public function allow_agent_own_attachment_deletion( $allcaps, $caps, $args, $user ) {
+		if ( empty( $args[0] ) || 'delete_post' !== $args[0] || empty( $args[2] ) ) {
+			return $allcaps;
+		}
+
+		if ( empty( $allcaps['edit_listings'] ) || empty( $allcaps['upload_files'] ) ) {
+			return $allcaps;
+		}
+
+		$attachment = get_post( absint( $args[2] ) );
+
+		if ( ! $attachment instanceof WP_Post || 'attachment' !== $attachment->post_type ) {
+			return $allcaps;
+		}
+
+		if ( (int) $attachment->post_author !== (int) $user->ID ) {
+			return $allcaps;
+		}
+
+		// Grant only the primitive caps required for deleting the agent's own attachment.
+		foreach ( $caps as $cap ) {
+			$allcaps[ $cap ] = true;
+		}
+
+		return $allcaps;
 	}
 
 	/**

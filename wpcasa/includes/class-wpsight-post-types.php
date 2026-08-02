@@ -15,6 +15,12 @@ class WPSight_Post_Type_Listing {
 
 		// Register listing post type
 		add_action( 'init', array( $this, 'register_post_type_listing' ), 0 );
+
+		// Register listing meta fields for the REST API when enabled.
+		add_action( 'init', array( $this, 'register_listing_rest_meta' ), 1 );
+
+		// Hide private listing meta from public REST responses.
+		add_filter( 'rest_prepare_' . wpsight_post_type(), array( $this, 'filter_listing_rest_response_meta' ), 10, 3 );
 		
 		// Register custom post statuses
 		add_action( 'init', array( $this, 'register_post_statuses' ), 0 );
@@ -80,8 +86,8 @@ class WPSight_Post_Type_Listing {
 		// Custom admin capability
 		$admin_capability = 'edit_listings';
 
-        // Option value show in REST API true/false
-		$show_in_rest = apply_filters( 'wpsight_show_in_rest', wpsight_get_option('listings_rest_api' ) );
+		// Option value show in REST API true/false
+		$show_in_rest = $this->is_rest_api_enabled();
 
 		// Set labels and localize them
 	
@@ -321,6 +327,340 @@ class WPSight_Post_Type_Listing {
 		register_post_type( 'listing', $args );
     	
 	}
+
+	/**
+	 * is_rest_api_enabled()
+	 *
+	 * Check if listings should be exposed in the REST API.
+	 *
+	 * @access protected
+	 * @uses wpsight_get_option()
+	 * @uses apply_filters()
+	 * @return bool True when listing REST support is enabled.
+	 *
+	 * @since 1.5.4
+	 */
+	protected function is_rest_api_enabled() : bool {
+		return (bool) apply_filters( 'wpsight_show_in_rest', wpsight_get_option( 'listings_rest_api' ) );
+	}
+
+	/**
+	 * register_listing_rest_meta()
+	 *
+	 * Register WPCasa listing meta fields for the REST API.
+	 *
+	 * @access public
+	 * @uses register_post_meta()
+	 * @uses wpsight_post_type()
+	 * @uses apply_filters()
+	 *
+	 * @since 1.5.4
+	 */
+	public function register_listing_rest_meta() {
+		if ( ! $this->is_rest_api_enabled() ) {
+			return;
+		}
+
+		foreach ( $this->get_listing_rest_meta_fields() as $meta_key => $args ) {
+			register_post_meta(
+				wpsight_post_type(),
+				$meta_key,
+				wp_parse_args(
+					$args,
+					array(
+						'single'            => true,
+						'auth_callback'     => array( $this, 'listing_rest_meta_auth_callback' ),
+						'show_in_rest'      => array(
+							'schema' => array(
+								'type' => 'string',
+							),
+						),
+						'sanitize_callback' => 'sanitize_text_field',
+					)
+				)
+			);
+		}
+	}
+
+	/**
+	 * get_listing_rest_meta_fields()
+	 *
+	 * Return WPCasa listing meta fields exposed through the REST API.
+	 *
+	 * @access protected
+	 * @uses wpsight_details()
+	 * @uses apply_filters()
+	 * @return array REST meta field definitions.
+	 *
+	 * @since 1.5.4
+	 */
+	protected function get_listing_rest_meta_fields() : array {
+		$string_field = array(
+			'type'              => 'string',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type' => 'string',
+				),
+			),
+			'sanitize_callback' => 'sanitize_text_field',
+		);
+
+		$textarea_field = array(
+			'type'              => 'string',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type' => 'string',
+				),
+			),
+			'sanitize_callback' => 'sanitize_textarea_field',
+		);
+
+		$boolean_field = array(
+			'type'              => 'boolean',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type' => 'boolean',
+				),
+			),
+			'sanitize_callback' => 'rest_sanitize_boolean',
+		);
+
+		$integer_field = array(
+			'type'              => 'integer',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type' => 'integer',
+				),
+			),
+			'sanitize_callback' => 'absint',
+		);
+
+		$url_field = array(
+			'type'              => 'string',
+			'single'            => true,
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type'   => 'string',
+					'format' => 'uri',
+				),
+			),
+			'sanitize_callback' => 'esc_url_raw',
+		);
+
+		$map_field = array(
+			'single'            => true,
+			'type'              => 'object',
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type'                 => 'object',
+					'properties'           => array(
+						'lat'  => array(
+							'type' => 'string',
+						),
+						'long' => array(
+							'type' => 'string',
+						),
+					),
+					'additionalProperties' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'sanitize_callback' => array( $this, 'sanitize_listing_rest_meta_map' ),
+		);
+
+		$gallery_field = array(
+			'single'            => true,
+			'type'              => 'object',
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type'                 => 'object',
+					'additionalProperties' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'sanitize_callback' => array( $this, 'sanitize_listing_rest_meta_gallery' ),
+		);
+
+		$fields = array(
+			'_listing_id'            => $string_field,
+			'_listing_not_available' => $boolean_field,
+			'_listing_sticky'        => $boolean_field,
+			'_listing_featured'      => $boolean_field,
+			'_gallery'               => $gallery_field,
+			'_price'                 => array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type' => 'string',
+					),
+				),
+				'sanitize_callback' => array( 'WPSight_Meta_Boxes', 'sanitize_meta_box_listing_price' ),
+			),
+			'_price_offer'           => $string_field,
+			'_price_period'          => $string_field,
+			'_map_address'           => $string_field,
+			'_map_geolocation'       => $map_field,
+			'_map_note'              => $string_field,
+			'_map_secret'            => $textarea_field,
+			'_map_hide'              => $boolean_field,
+			'_map_type'              => $string_field,
+			'_map_zoom'              => $integer_field,
+			'_map_no_streetview'     => $boolean_field,
+			'_geolocation_lat'       => $string_field,
+			'_geolocation_long'      => $string_field,
+			'_geolocation_elevation' => $string_field,
+			'_geolocation_city'      => $string_field,
+			'_geolocation_country_long'  => $string_field,
+			'_geolocation_country_short' => $string_field,
+			'_geolocation_formatted_address' => $string_field,
+			'_geolocation_state_long'    => $string_field,
+			'_geolocation_state_short'   => $string_field,
+			'_geolocation_street'    => $string_field,
+			'_geolocation_zipcode'   => $string_field,
+			'_geolocation_postcode'  => $string_field,
+			'_agent_name'            => $string_field,
+			'_agent_company'         => $string_field,
+			'_agent_description'     => $textarea_field,
+			'_agent_phone'           => $string_field,
+			'_agent_website'         => $url_field,
+			'_agent_twitter'         => $string_field,
+			'_agent_facebook'        => $string_field,
+			'_agent_logo'            => $url_field,
+			'_agent_logo_id'         => $integer_field,
+		);
+
+		foreach ( wpsight_details() as $detail ) {
+			if ( ! empty( $detail['id'] ) ) {
+				$fields[ '_' . $detail['id'] ] = $string_field;
+			}
+		}
+
+		return apply_filters( 'wpsight_listing_rest_meta_fields', $fields );
+	}
+
+	/**
+	 * listing_rest_meta_auth_callback()
+	 *
+	 * Limit protected listing meta access to users who can edit the listing.
+	 *
+	 * @access public
+	 *
+	 * @param bool   $allowed   Whether access is allowed.
+	 * @param string $meta_key  Meta key being checked.
+	 * @param int    $object_id Object ID being checked.
+	 * @param int    $user_id   User ID being checked.
+	 *
+	 * @return bool True when the user may access listing meta.
+	 *
+	 * @since 1.5.4
+	 */
+	public function listing_rest_meta_auth_callback( bool $allowed, string $meta_key, int $object_id, int $user_id ) : bool {
+		if ( ! $this->is_rest_api_enabled() ) {
+			return false;
+		}
+
+		if ( ! empty( $object_id ) ) {
+			return user_can( $user_id, 'edit_post', $object_id );
+		}
+
+		return user_can( $user_id, 'edit_listings' );
+	}
+
+	/**
+	 * filter_listing_rest_response_meta()
+	 *
+	 * Remove private WPCasa meta from REST responses for users who cannot edit the listing.
+	 *
+	 * @access public
+	 *
+	 * @param WP_REST_Response $response REST response object.
+	 * @param WP_Post          $post     Listing post object.
+	 * @param WP_REST_Request  $request  REST request object.
+	 *
+	 * @return WP_REST_Response Filtered REST response object.
+	 *
+	 * @since 1.5.4
+	 */
+	public function filter_listing_rest_response_meta( WP_REST_Response $response, WP_Post $post, $request ) {
+		if ( ! $this->is_rest_api_enabled() || current_user_can( 'edit_post', $post->ID ) ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+
+		if ( empty( $data['meta'] ) || ! is_array( $data['meta'] ) ) {
+			return $response;
+		}
+
+		foreach ( array_keys( $this->get_listing_rest_meta_fields() ) as $meta_key ) {
+			unset( $data['meta'][ $meta_key ] );
+		}
+
+		$response->set_data( $data );
+
+		return $response;
+	}
+
+	/**
+	 * sanitize_listing_rest_meta_map()
+	 *
+	 * Sanitize map coordinates from REST meta requests.
+	 *
+	 * @access public
+	 * @param mixed $value Submitted meta value.
+	 * @return array Sanitized map data.
+	 *
+	 * @since 1.5.4
+	 */
+	public function sanitize_listing_rest_meta_map( $value ) : array {
+		$value = is_array( $value ) ? $value : array();
+		$map   = array();
+
+		foreach ( $value as $key => $map_value ) {
+			if ( ! is_scalar( $map_value ) ) {
+				continue;
+			}
+
+			$map[ sanitize_key( $key ) ] = sanitize_text_field( $map_value );
+		}
+
+		return $map;
+	}
+
+	/**
+	 * sanitize_listing_rest_meta_gallery()
+	 *
+	 * Sanitize gallery attachment IDs and URLs from REST meta requests.
+	 *
+	 * @access public
+	 * @param mixed $value Submitted meta value.
+	 * @return array Sanitized gallery data.
+	 *
+	 * @since 1.5.4
+	 */
+	public function sanitize_listing_rest_meta_gallery( $value ) : array {
+		$value   = is_array( $value ) ? $value : array();
+		$gallery = array();
+
+		foreach ( $value as $attachment_id => $url ) {
+			$attachment_id = absint( $attachment_id );
+
+			if ( ! $attachment_id || ! is_scalar( $url ) ) {
+				continue;
+			}
+
+			$gallery[ $attachment_id ] = esc_url_raw( $url );
+		}
+
+		return $gallery;
+	}
 	
 	/**
 	 * register_post_statuses()
@@ -353,7 +693,9 @@ class WPSight_Post_Type_Listing {
 	 * our templated output.
  	 *
  	 * @access public
+ 	 *
  	 * @param object $query WP_Query of the corresponding loop
+ 	 *
  	 * @uses $query->is_main_query()
  	 * @uses wpsight_is_listings_archive()
  	 * @uses current_filter()
@@ -361,7 +703,7 @@ class WPSight_Post_Type_Listing {
  	 *
  	 * @since 1.0.0
 	 */
-	public function template_listing_archive( $query ) {
+	public function template_listing_archive( object $query ) {
 		
 		// Make sure this is a main query
 		
@@ -402,7 +744,9 @@ class WPSight_Post_Type_Listing {
 	 * pages with our templated output.
  	 *
  	 * @access public
+ 	 *
  	 * @param object $query WP_Query of the corresponding loop
+ 	 *
  	 * @uses $query->is_main_query()
  	 * @uses wpsight_is_listing_archive()
  	 * @uses current_filter()
@@ -410,7 +754,7 @@ class WPSight_Post_Type_Listing {
  	 *
  	 * @since 1.0.0
 	 */
-	public function template_listing_single( $query ) {
+	public function template_listing_single( object $query ) {
 		
 		// Make sure this is a main query
 		
@@ -485,14 +829,16 @@ class WPSight_Post_Type_Listing {
 	 * when a post is created or saved.
 	 *
 	 * @access public
-	 * @param int $post_id Post ID of the corresponding entry
-	 * @param object WP_Post object
+	 *
+	 * @param int    $post_id Post ID of the corresponding entry
+	 * @param object $post    WP_Post object
+	 *
 	 * @uses wpsight_post_type()
 	 * @uses add_post_meta()
 	 *
 	 * @since 1.0.0
 	 */
-	public function maybe_add_default_meta( $post_id, $post = '' ) {
+	public function maybe_add_default_meta( int $post_id, $post = '' ) {
 		if ( empty( $post ) || wpsight_post_type() == $post->post_type ) {
 			add_post_meta( $post_id, '_listing_not_available', 0, true );
 			add_post_meta( $post_id, '_listing_sticky', 0, true );
@@ -503,7 +849,7 @@ class WPSight_Post_Type_Listing {
 	/**
 	 * delete_listing_previews()
 	 *
-	 * Delete old listings with preview status when actived.
+	 * Delete old listings with preview status when active.
 	 *
 	 * @access public
 	 * @uses wpsight_delete_listing_previews()

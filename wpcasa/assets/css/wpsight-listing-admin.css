@@ -1409,37 +1409,10 @@ th.column-listing_actions {
  * WPCasa Settings Page - Base Styles
  **************************************************/
 
-@media (max-width: 600px) {
-    .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar-back,
-    .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar {
-        margin-left: -260px;
-    }
-
-    .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main {
-        margin-left: 0 !important;
-        width: 100%;
-    }
-}
-
 @media (max-width: 992px) {
     #wpwrap {
         overflow-x: hidden;
     }
-}
-
-.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar-back,
-.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-sidebar,
-.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main {
-    transition: .6s margin-left ease;
-}
-
-.wpsight-settings-page .wpsight-settings-wrap-hide-navbar .wpsight-admin-sidebar-back,
-.wpsight-settings-page .wpsight-settings-wrap-hide-navbar .wpsight-admin-sidebar {
-    margin-left: 0;
-}
-
-.wpsight-settings-page .wpsight-settings-wrap.wpsight-settings-wrap-hide-navbar .wpsight-admin-main {
-    margin-left: 260px !important;
 }
 
 .wpsight-settings-page .wpsight-settings-wrap input {
@@ -2397,67 +2370,6 @@ ul#adminmenu>li.current>a.current:after {
         height: 45px !important;
         padding: .3rem .75rem !important;
     }
-}
-
-.wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main-wrap-btn-toggle {
-    min-height: auto;
-    display: none;
-}
-
-
-@media (max-width: 600px) {
-    .wpsight-settings-page .wpsight-settings-wrap .wpsight-admin-main-wrap-btn-toggle {
-        display: block;
-    }
-}
-
-
-.wpsight-admin-main-btn-toggle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 28px;
-    position: relative;
-    top: 0;
-    background: none;
-    border: none;
-    outline: none;
-}
-
-.wpsight-admin-main-btn-toggle .wpsight-admin-main-btn-toggle-line {
-    position: relative;
-    height: 3px;
-    width: inherit;
-    transition: .4s all ease;
-    background: #000;
-    border-radius: 10px;
-}
-
-.wpsight-admin-main-btn-toggle .wpsight-admin-main-btn-toggle-line:nth-child(2) {
-    margin: 8px 0;
-}
-
-.wpsight-admin-main-btn-toggle .wpsight-admin-main-btn-toggle-line:nth-child(3) {
-    align-self: flex-start;
-}
-
-
-.wpsight-admin-main-btn-toggle-active .wpsight-admin-main-btn-toggle-line:nth-child(1) {
-    margin-bottom: -3px;
-    transform: rotate(45deg);
-}
-
-.wpsight-admin-main-btn-toggle-active .wpsight-admin-main-btn-toggle-line:nth-child(2) {
-    margin: 0;
-    transform: translate(-100%, 0);
-    opacity: 0;
-}
-
-.wpsight-admin-main-btn-toggle-active .wpsight-admin-main-btn-toggle-line:nth-child(3) {
-    margin-top: -3px;
-    transform: rotate(-45deg);
 }
 
 body.post-type-listing .wp-list-table.posts .column-title {

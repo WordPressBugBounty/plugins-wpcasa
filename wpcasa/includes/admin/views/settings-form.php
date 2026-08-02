@@ -1,111 +1,200 @@
-<?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
+<?php
+/**
+ * Render the WPCasa settings form.
+ *
+ * A section keeps the existing two-element structure for its label and
+ * fields. Add-ons can opt into a second navigation level by registering a
+ * `tabs` map in the optional third element and assigning fields with `tab`.
+ *
+ * @package WPCasa
+ * @updated 1.5.4
+ */
 
-<?php   $settings = isset( $settings ) ? $settings : '';
-        $settings_group = isset( $settings_group ) ? $settings_group : '';
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+$settings       = isset( $settings ) && is_array( $settings ) ? $settings : array();
+$settings_group = isset( $settings_group ) ? $settings_group : '';
 ?>
 
 <form method="post" action="options.php">
 
-    <?php settings_fields( $settings_group ); ?>
+	<?php settings_fields( $settings_group ); ?>
 
-    <?php
+	<?php
+	foreach ( $settings as $key => $section ) {
+		if ( ! is_array( $section ) ) {
+			continue;
+		}
 
-    foreach ( $settings as $key => $section ) {
+		// Normalize the optional tab metadata while preserving legacy sections.
+		$section_id          = sanitize_title( $key );
+		$section_tabs        = $this->get_section_tabs( $section );
+		$section_tab_options = $this->get_section_tab_options( $section, $section_tabs );
+		?>
 
-        echo '<div id="settings-' . esc_attr( sanitize_title( $key ) ) . '" class="settings_panel">'; ?>
+		<div id="settings-<?php echo esc_attr( $section_id ); ?>" class="settings_panel">
+			<div class="wpsight-admin-ui-container">
+				<div class="wpsight-admin-ui-grid">
+					<div class="wpsight-admin-ui-grid-col wpsight-admin-ui-grid-1-1">
+						<div class="wpsight-admin-ui-panel wpsight-admin-ui-panel-large">
 
-        <div class="wpsight-admin-ui-container">
+							<?php
+							if ( empty( $section_tabs ) ) {
+								// Render legacy sections through the shared field view.
+								$settings_options = isset( $section[1] ) && is_array( $section[1] )
+									? $section[1]
+									: array();
 
-            <div class="wpsight-admin-ui-grid">
+								require WPSIGHT_PLUGIN_DIR . '/includes/admin/views/settings-fields.php';
+							} else {
+								if ( ! empty( $section_tab_options['common'] ) ) {
+									$settings_options = $section_tab_options['common'];
 
-                <div class="wpsight-admin-ui-grid-col wpsight-admin-ui-grid-1-1">
-                    <div class="wpsight-admin-ui-panel wpsight-admin-ui-panel-large">
+									require WPSIGHT_PLUGIN_DIR . '/includes/admin/views/settings-fields.php';
+								}
+								?>
 
-                        <table class="form-table">
+								<div
+									class="wpsight-settings-subtabs"
+									data-wpsight-settings-section="<?php echo esc_attr( $section_id ); ?>"
+								>
+									<?php $tab_select_id = 'settings-' . $section_id . '-subtab-select'; ?>
 
-                            <?php foreach ( $section[1] as $option ) {
-                                $option_css			= sanitize_html_class( $this->settings_name . '_' . $option['id'] );
+									<?php // The mobile select mirrors the desktop tab list and is synchronized in JavaScript. ?>
+									<div class="wpsight-settings-subtab-select-wrap">
+										<label
+											class="wpsight-settings-subtab-select-label"
+											for="<?php echo esc_attr( $tab_select_id ); ?>"
+										>
+											<?php echo esc_html__( 'Select section', 'wpcasa' ); ?>
+										</label>
 
-                                $option_name		= isset( $option['name'] )				? stripslashes ( $option['name'] )					: '';
-                                $option_desc		= isset( $option['desc'] )				? stripslashes ( $option['desc'] )					: '';
-                                $option_type		= isset( $option['type'] )				? $option['type']									: '';
-                                $class				= isset( $option['class'] )				? ' ' . $option['class']							: '';
+										<select
+											id="<?php echo esc_attr( $tab_select_id ); ?>"
+											class="wpsight-settings-subtab-select"
+											data-wpsight-settings-subtab-select
+										>
+											<?php
+											$is_first_option = true;
 
-                                $compare_class = '';
+											foreach ( $section_tabs as $tab_id => $tab_label ) {
+												?>
 
-                                if ( isset( $option['show_if'] ) ) {
-                                    $dependable_option_id = isset( $option['show_if']['id'] ) ? $option['show_if']['id'] : null;
-                                    $comparable_value = isset( $option['show_if']['value'] ) ? $option['show_if']['value'] : null;
-                                    $comparision_operator = isset( $option['show_if']['compare'] ) ? $option['show_if']['compare'] : '==';
+												<option
+													value="<?php echo esc_attr( $tab_id ); ?>"
+													<?php selected( $is_first_option ); ?>
+												>
+													<?php echo esc_html( $tab_label ); ?>
+												</option>
 
-                                    if ( $dependable_option_id ) {
-                                        $dependable_option_value = wpsight_get_option( $dependable_option_id );
-                                        if ( ! empty( $comparision_operator ) ) {
-                                            switch ( $comparision_operator ) {
-                                                case '==' :
-                                                    $compare_result = $comparable_value == $dependable_option_value;
-                                                    $compare_class = $compare_result ? '' : 'hidden';
-                                                    ?>
-                                                    <script>
-                                                    jQuery(document).ready(function($) {
+												<?php
+												$is_first_option = false;
+											}
+											?>
+										</select>
+									</div>
 
-                                                        var dependableOptionId = '#setting-wpcasa_<?php echo $dependable_option_id; ?>';
-                                                        var optionId = '#setting-wpcasa_<?php echo $option['id']; ?>';
+									<?php // The desktop control follows the ARIA tabs pattern. ?>
+									<div
+										class="wpsight-settings-subtab-nav"
+										role="tablist"
+										aria-label="<?php echo esc_attr__( 'Settings sections', 'wpcasa' ); ?>"
+									>
+										<?php
+										$is_first_tab = true;
 
-                                                        $(document).on('click', dependableOptionId, function(e) {
-                                                            if ( $(dependableOptionId).is(':checked') ) {
-                                                                $(optionId).closest('tr').removeClass('hidden');
-                                                            } else {
-                                                                $(optionId).closest('tr').addClass('hidden');
-                                                            }
-                                                        });
+										foreach ( $section_tabs as $tab_id => $tab_label ) {
+											$tab_button_id = 'settings-' . $section_id . '-subtab-' . $tab_id;
+											$tab_panel_id  = 'settings-' . $section_id . '-subpanel-' . $tab_id;
+											$tab_class     = $is_first_tab ? 'nav-tab nav-tab-active' : 'nav-tab';
+											?>
 
-                                                    });
-                                                    </script>
-                                                    <?php
-                                                    break;
-                                            }
-                                        }
-                                    }
+											<button
+												type="button"
+												id="<?php echo esc_attr( $tab_button_id ); ?>"
+												class="<?php echo esc_attr( $tab_class ); ?>"
+												role="tab"
+												aria-controls="<?php echo esc_attr( $tab_panel_id ); ?>"
+												aria-selected="<?php echo esc_attr( $is_first_tab ? 'true' : 'false' ); ?>"
+												tabindex="<?php echo esc_attr( $is_first_tab ? '0' : '-1' ); ?>"
+												data-wpsight-settings-subtab="<?php echo esc_attr( $tab_id ); ?>"
+											>
+												<?php echo esc_html( $tab_label ); ?>
+											</button>
 
-                                }
-                                ?>
+											<?php
+											$is_first_tab = false;
+										}
+										?>
+									</div>
 
-                                <tr valign="top" class="setting-<?php echo esc_attr( $option_css ) ?>-tr<?php echo esc_attr( $class ) ?> <?php echo esc_attr( $compare_class ); ?>">
-                                    <?php
+									<?php
+									$is_first_tab = true;
 
-                                    if( ( $option_type == 'pageheading' ) || ( $option_type == 'heading' ) ) {
-                                        require  plugin_dir_path( __FILE__ ) . 'option-' . $option_type . '.php';
+									// Render every panel so hooks can populate tabs without registered fields.
+									foreach ( array_keys( $section_tabs ) as $tab_id ) {
+										$tab_button_id    = 'settings-' . $section_id . '-subtab-' . $tab_id;
+										$tab_panel_id     = 'settings-' . $section_id . '-subpanel-' . $tab_id;
+										$tab_panel_class  = $is_first_tab ? 'wpsight-settings-subpanel is-active' : 'wpsight-settings-subpanel';
+										$settings_options = $section_tab_options['tabs'][ $tab_id ];
+										?>
 
-                                    } else { ?>
+										<div
+											id="<?php echo esc_attr( $tab_panel_id ); ?>"
+											class="<?php echo esc_attr( $tab_panel_class ); ?>"
+											role="tabpanel"
+											aria-labelledby="<?php echo esc_attr( $tab_button_id ); ?>"
+											data-wpsight-settings-subpanel="<?php echo esc_attr( $tab_id ); ?>"
+										>
+											<?php
+											/**
+											 * Fires before a WPCasa settings subtab is rendered.
+											 *
+											 * @since 1.5.4
+											 *
+											 * @param string $section_id Sanitized settings section ID.
+											 * @param string $tab_id     Sanitized settings tab ID.
+											 * @param array  $section    Complete settings section data.
+											 */
+											do_action( 'wpsight_settings_subtab_before', $section_id, $tab_id, $section );
 
-                                        <th scope="row">
-                                            <label for="setting-<?php echo esc_attr( $option_css ) ?>"><?php echo esc_html( $option_name ) ?></label>
-                                            <p class="description"><?php echo wp_kses( $option_desc, wp_kses_allowed_html( 'post' ) ) ?></p>
-                                        </th>
-                                        <td>
-                                            <div class="wpsight-settings-field-wrap wpsight-settings-field-<?php echo esc_attr( $option_type ) ?>-wrap">
+											if ( ! empty( $settings_options ) ) {
+												require WPSIGHT_PLUGIN_DIR . '/includes/admin/views/settings-fields.php';
+											}
 
-                                                <?php require  plugin_dir_path( __FILE__ ) . '/option-' . $option_type . '.php'; ?>
+											/**
+											 * Fires after a WPCasa settings subtab is rendered.
+											 *
+											 * @since 1.5.4
+											 *
+											 * @param string $section_id Sanitized settings section ID.
+											 * @param string $tab_id     Sanitized settings tab ID.
+											 * @param array  $section    Complete settings section data.
+											 */
+											do_action( 'wpsight_settings_subtab_after', $section_id, $tab_id, $section );
+											?>
+										</div>
 
-                                            </div>
-                                        </td>
-                                    <?php  } ?>
-                                </tr>
+										<?php
+										$is_first_tab = false;
+									}
+									?>
+								</div>
 
-                            <?php  } ?>
+								<?php
+							}
+							?>
 
-                        </table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        </div>
-
-    <?php  } ?>
+		<?php
+	}
+	?>
 
 </form>

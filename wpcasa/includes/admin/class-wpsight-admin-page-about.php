@@ -65,14 +65,31 @@ if ( ! class_exists( 'WPSight_About' ) ) :
                             <h3><?php echo esc_html__( 'Changelog', 'wpcasa' ) ?></h3>
 
                             <ul class="tabs" data-tabgroup="first-tab-group">
-                                <li class="tab"><a href="#version-1-5-3" class="active">v1.5.3</a></li>
+                                <li class="tab"><a href="#version-1-5-4" class="active">v1.5.4</a></li>
+                                <li class="tab"><a href="#version-1-5-3">v1.5.3</a></li>
                                 <li class="tab"><a href="#version-1-5-2">v1.5.2</a></li>
                                 <li class="tab"><a href="#version-1-5-1">v1.5.1</a></li>
-                                <li class="tab"><a href="#version-1-5-0">v1.5.0</a></li>
                                 <li><a href="https://wordpress.org/plugins/wpcasa/#developers" target="_blank"><?php echo esc_html__( 'More', 'wpcasa' ); ?></a></li>
                             </ul>
 
                             <section id="first-tab-group" class="tabgroup">
+                                <div id="version-1-5-4">
+                                    <p>Version: 1.5.4</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-new">New</span></td>
+                                            <td>Tab navigation on settings page was added</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Not working mobile menu of admin settings page on mobile devices</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Under certain circumstances, not all pages were listed for selection of the Listings Page in the Settings page.</td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-5-3">
                                     <p>Version: 1.5.3</p>
                                     <table>
@@ -125,50 +142,6 @@ if ( ! class_exists( 'WPSight_About' ) ) :
                                         <tr>
                                             <td><span class="changelog-entry-tweak">Tweak</span></td>
                                             <td>Added notice when editing agent information on user page.</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div id="version-1-5-0">
-                                    <p>Version: 1.5.0</p>
-                                    <table>
-                                        <tr>
-                                            <td><span class="changelog-entry-new">New</span></td>
-                                            <td>An option has been added to delete the listings media files when a listing is deleted.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-new">New</span></td>
-                                            <td>An admin notice was added for outdated WPCasa themes that require an update to keep the single listing location output working.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-new">New</span></td>
-                                            <td>A notice was added inviting users to <a href="https://wordpress.org/plugins/wpcasa/#reviews" target="_blank">review WPCasa</a> on WordPress.org.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-new">New</span></td>
-                                            <td>Helpful links were added to the plugin row meta on the plugins screen.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>Creating WPCasa user roles is now handled on activation and remove them on deactivation.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Load Google Maps API only when an API key is available</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Improved Google Maps API loading with async callback handling for listing maps</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Improved message handling for discontinued WPCasa add-ons</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>The file uninstall.php was introduced to remove all WPCasa data when uninstalling the plugin.</td>
-                                        </tr>                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Improved PHP 8 compatibility</td>
                                         </tr>
                                     </table>
                                 </div>

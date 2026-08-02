@@ -103,6 +103,7 @@ class WPSight_Admin {
      *	@uses	wp_enqueue_script()
      *
      *	@since 1.0.0
+	 * @updated 1.5.4
      */
     public function admin_enqueue_scripts() {
 
@@ -153,6 +154,44 @@ class WPSight_Admin {
 				'name' => $this->settings_page->settings_name
 			) ), 'before' );
 
+			// Load the optional second settings level only on the WPCasa settings screen.
+			if ( 'toplevel_page_wpsight-settings' === $screen->id ) {
+				$settings_style_dependencies = array( 'wpsight-listing-admin' );
+
+				if ( is_rtl() ) {
+					$settings_style_dependencies[] = 'wpsight-listing-admin-rtl';
+				}
+
+				wp_enqueue_style(
+					'wpsight-settings-sidebar',
+					WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-settings-sidebar' . $suffix . '.css',
+					$settings_style_dependencies,
+					WPSIGHT_VERSION
+				);
+
+				wp_enqueue_style(
+					'wpsight-settings-tabs',
+					WPSIGHT_PLUGIN_URL . '/assets/css/wpsight-settings-tabs' . $suffix . '.css',
+					array( 'wpsight-settings-sidebar' ),
+					WPSIGHT_VERSION
+				);
+
+				wp_enqueue_script(
+					'wpsight-settings-sidebar',
+					WPSIGHT_PLUGIN_URL . '/assets/js/wpsight-settings-sidebar' . $suffix . '.js',
+					array( 'jquery', 'wpsight_admin_js' ),
+					WPSIGHT_VERSION,
+					true
+				);
+
+				wp_enqueue_script(
+					'wpsight-settings-tabs',
+					WPSIGHT_PLUGIN_URL . '/assets/js/wpsight-settings-tabs' . $suffix . '.js',
+					array( 'jquery', 'wpsight-settings-sidebar' ),
+					WPSIGHT_VERSION,
+					true
+				);
+			}
         }
 		
 		if ( $screen->id == 'wpcasa_page_wpsight-about' )
@@ -551,12 +590,21 @@ class WPSight_Admin {
      *	@return	array	$options
      *
      *	@since 1.0.0
+	 * @updated 1.5.4
      */
     public static function options() {
         $options = array(
             'listings' => array(
                 '<span class="dashicons dashicons-admin-multisite"></span>' . __( 'Listings', 'wpcasa' ),
-                (array) self::options_listings()
+				(array) self::options_listings(),
+				array(
+					'tabs' => array(
+						'general'  => __( 'General', 'wpcasa' ),
+						'currency' => __( 'Currency', 'wpcasa' ),
+						'listing'  => __( 'Listing', 'wpcasa' ),
+						'rental'   => __( 'Rental', 'wpcasa' ),
+					),
+				),
             ),
 //            'search' => array(
 //                '<span class="dashicons dashicons-search"></span>' . __( 'Search', 'wpcasa' ),
@@ -622,6 +670,7 @@ class WPSight_Admin {
      *	@return	array	$options_listings
      *
      *	@since 1.0.0
+	 * @updated 1.5.4
      */
     public static function options_listings() {
 
@@ -849,6 +898,41 @@ class WPSight_Admin {
             );
 
         }
+
+		// Assign every core field to its Listings settings tab.
+		$listings_tab_fields = array(
+			'general'  => array(
+				'heading_listings',
+				'listings_page',
+				'date_format',
+				'listings_css',
+				'listing_id',
+				'measurement_unit',
+				'heading_rest_api',
+				'listings_rest_api',
+				'heading_media',
+				'listings_delete_media',
+			),
+			'currency' => array(
+				'heading_currency',
+				'currency',
+				'currency_other',
+				'currency_other_ent',
+				'currency_symbol',
+				'currency_separator',
+				'decimal_separator',
+			),
+			'listing'  => array_merge( array( 'heading_details' ), array_keys( wpsight_details() ) ),
+			'rental'   => array_merge( array( 'heading_rental_periods' ), array_keys( wpsight_rental_periods() ) ),
+		);
+
+		foreach ( $listings_tab_fields as $tab_id => $field_ids ) {
+			foreach ( $field_ids as $field_id ) {
+				if ( isset( $options_listings[ $field_id ] ) ) {
+					$options_listings[ $field_id ]['tab'] = $tab_id;
+				}
+			}
+		}
 
         // filter options
         $options_listings = apply_filters( 'wpsight_options_listings', $options_listings );

@@ -1,0 +1,165 @@
+/**
+ * Handle the mobile WPCasa settings navigation.
+ *
+ * The desktop sidebar remains part of the normal page layout. At the
+ * WordPress administration mobile breakpoint, the same navigation becomes
+ * an overlay drawer without moving the settings content.
+ *
+ * @package WPCasa
+ * @since 1.5.4
+ */
+
+jQuery( function( $ ) {
+	'use strict';
+
+	var $body = $( 'body' );
+	var $settingsWrap = $( '.wpsight-settings-wrap' );
+	var $sidebar = $( '#wpsight-admin-sidebar' );
+	var $sidebarBackdrop = $settingsWrap.find( '.wpsight-admin-sidebar-back' );
+	var $sidebarClose = $sidebar.find( '.wpsight-admin-sidebar-close' );
+	var $sidebarToggle = $settingsWrap.find( '.wpsight-settings-sidebar-toggle' );
+	var $main = $settingsWrap.find( '.wpsight-admin-main' );
+	var mobileQuery = window.matchMedia( '(max-width: 782px)' );
+	var openClass = 'wpsight-settings-sidebar-open';
+	var bodyOpenClass = 'wpsight-settings-sidebar-is-open';
+	var openLabel = $sidebarToggle.attr( 'data-wpsight-open-label' );
+	var closeLabel = $sidebarToggle.attr( 'data-wpsight-close-label' );
+
+	if ( ! $settingsWrap.length || ! $sidebar.length || ! $sidebarToggle.length ) {
+		return;
+	}
+
+	/**
+	 * Set the mobile sidebar state and its accessibility attributes.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param {boolean} isOpen            Whether the drawer should be open.
+	 * @param {boolean} shouldReturnFocus Whether focus should return to the toggle.
+	 * @return {void}
+	 */
+	var setSidebarState = function( isOpen, shouldReturnFocus ) {
+		if ( ! mobileQuery.matches ) {
+			return;
+		}
+
+		$settingsWrap.toggleClass( openClass, isOpen );
+		$body.toggleClass( bodyOpenClass, isOpen );
+		$sidebarToggle.attr( {
+			'aria-expanded': isOpen ? 'true' : 'false',
+			'aria-label': isOpen ? closeLabel : openLabel
+		} );
+
+		if ( isOpen ) {
+			$main.attr( 'inert', 'inert' );
+			$sidebar
+				.attr( 'aria-hidden', 'false' )
+				.removeAttr( 'inert' );
+			$sidebarClose.trigger( 'focus' );
+			return;
+		}
+
+		$main.removeAttr( 'inert' );
+
+		if ( shouldReturnFocus ) {
+			$sidebarToggle.trigger( 'focus' );
+		}
+
+		$sidebar
+			.attr( {
+				'aria-hidden': 'true',
+				inert: 'inert'
+			} );
+	};
+
+	/**
+	 * Reset the drawer when the responsive breakpoint changes.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @return {void}
+	 */
+	var syncSidebarForViewport = function() {
+		var adminBarHeight = $( '#wpadminbar' ).outerHeight() || 0;
+
+		$settingsWrap.get( 0 ).style.setProperty(
+			'--wpsight-settings-admin-bar-height',
+			adminBarHeight + 'px'
+		);
+
+		if ( mobileQuery.matches ) {
+			setSidebarState( false, false );
+			return;
+		}
+
+		$settingsWrap.removeClass( openClass );
+		$body.removeClass( bodyOpenClass );
+		$main.removeAttr( 'inert' );
+		$sidebar
+			.attr( 'aria-hidden', 'false' )
+			.removeAttr( 'inert' );
+		$sidebarToggle.attr( {
+			'aria-expanded': 'false',
+			'aria-label': openLabel
+		} );
+	};
+
+	$sidebarToggle.on( 'click', function() {
+		var isOpen = $settingsWrap.hasClass( openClass );
+
+		setSidebarState( ! isOpen, false );
+	} );
+
+	$sidebarClose.add( $sidebarBackdrop ).on( 'click', function() {
+		setSidebarState( false, true );
+	} );
+
+	$sidebar.find( '.wpsight-admin-nav a' ).on( 'click', function() {
+		setSidebarState( false, true );
+	} );
+
+	$( document ).on( 'keydown', function( event ) {
+		if ( 'Escape' === event.key && $settingsWrap.hasClass( openClass ) ) {
+			event.preventDefault();
+			setSidebarState( false, true );
+		}
+	} );
+
+	// Keep keyboard focus inside the open drawer.
+	$sidebar.on( 'keydown', function( event ) {
+		var $focusable;
+		var firstFocusable;
+		var lastFocusable;
+
+		if ( 'Tab' !== event.key || ! $settingsWrap.hasClass( openClass ) ) {
+			return;
+		}
+
+		$focusable = $sidebar
+			.find( 'a[href], button:not([disabled])' )
+			.filter( ':visible' );
+
+		if ( ! $focusable.length ) {
+			return;
+		}
+
+		firstFocusable = $focusable.get( 0 );
+		lastFocusable = $focusable.get( $focusable.length - 1 );
+
+		if ( event.shiftKey && document.activeElement === firstFocusable ) {
+			event.preventDefault();
+			$( lastFocusable ).trigger( 'focus' );
+		} else if ( ! event.shiftKey && document.activeElement === lastFocusable ) {
+			event.preventDefault();
+			$( firstFocusable ).trigger( 'focus' );
+		}
+	} );
+
+	if ( 'function' === typeof mobileQuery.addEventListener ) {
+		mobileQuery.addEventListener( 'change', syncSidebarForViewport );
+	} else {
+		mobileQuery.addListener( syncSidebarForViewport );
+	}
+
+	syncSidebarForViewport();
+} );

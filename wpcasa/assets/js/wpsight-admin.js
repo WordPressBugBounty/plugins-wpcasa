@@ -67,16 +67,6 @@ jQuery(document).ready(function($) {
     $('.download-wrapper .type-download .download-meta-price-details a').addClass('button');
 
 
-    // Switch navbar on click
-
-    $('.wpsight-admin-main-btn-toggle').click( function(e) {
-        e.preventDefault();
-
-        $(this).toggleClass("wpsight-admin-main-btn-toggle-active");
-
-        $(".wpsight-settings-wrap").toggleClass("wpsight-settings-wrap-hide-navbar");
-    });
-
     // Show color picker
 
     jQuery(document).ready(function($){
@@ -245,4 +235,3 @@ jQuery(document).ready(function($) {
     WPCasaAdminUIAccordion()
 
 });
-

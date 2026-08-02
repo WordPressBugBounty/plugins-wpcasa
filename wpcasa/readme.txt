@@ -5,12 +5,12 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=SYJNVSP2BKTQ4
 Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
-Tested up to: 7.0
-Stable tag: 1.5.3
+Tested up to: 7.1
+Stable tag: 1.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Flexible WordPress plugin to create professional real estate websites and manage property listings with ease. WPCasa is a worthy choice for single agents and portals.
+Flexible WordPress plugin to create professional real estate websites and manage property listings with ease, ideal for agents and portals of any size
 
 == Description ==
 
@@ -244,15 +244,18 @@ If you find WPCasa an interesting project, please feel free to have a look at ou
 3. Listing teasers
 4. Property search form (horizontal)
 5. Property search form (vertical)
-6. Plugin settings
-7. Property Management
+6. Plugin settings Listings General
+7. Plugin settings Listings Currency
+8. Plugin settings Listings Listing
+9. Plugin settings Listings Rental
+10. Property Management
 
 == Contributors ==
 This is a list of contributors to WPCasa.
 Many thanks to all of them for contributing and making WPCasa even better.
 
-[Mrinal Haque](https://profiles.wordpress.org/mrinal013/)
 [Kybernetik Services](https://www.kybernetik-services.com/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=wpcasa&utm_content=readme)
+[Mrinal Haque](https://profiles.wordpress.org/mrinal013/)
 [Joe Hana](https://wordpress.org/support/users/joehana/)
 [Fabian Marz](https://github.com/fabianmarz)
 [mistercode](https://wordpress.org/support/users/mistercode/)
@@ -270,6 +273,13 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.4 =
+* NEW: Added tab navigation on settings page
+* TWEAK: Added WPCasa meta fields to REST API
+* FIX: Allow listing agent to delete its own uploaded media files
+* FIX: Not working mobile menu of admin settings page on mobile devices
+* FIX: Show all pages for selection for "Listings Page" in the Settings page
+
 = 1.5.3 =
 * TWEAK: Improved handling of plugin option
 * FIX: Fixed "Automatic conversion of false to array is deprecated in includes/class-wpsight-helpers.php"

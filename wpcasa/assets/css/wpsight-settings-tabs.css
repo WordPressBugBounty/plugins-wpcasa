@@ -1,0 +1,140 @@
+/**
+ * WPCasa settings subtabs.
+ *
+ * Desktop uses an ARIA tab list. The mobile breakpoint replaces that list
+ * with the synchronized native select rendered by the settings form.
+ *
+ * @since 1.5.4
+ */
+
+/* Shared subtab container. */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtabs {
+	clear: both;
+	margin-top: 0;
+}
+
+/* Mobile select; hidden while the desktop tab list is available. */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-select-wrap {
+	display: none;
+	margin: 0 0 2rem;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-select-label {
+	display: block;
+	margin: 0 0 8px;
+	color: rgba(0, 0, 0, .7);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-select {
+	width: 100%;
+	max-width: none;
+	min-height: 44px;
+	margin: 0;
+	color: rgba(0, 0, 0, .82);
+	background-color: #fff;
+	border-color: rgba(0, 0, 0, .2);
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-select:focus {
+	border-color: #12ae8f;
+	box-shadow: 0 0 0 1px #12ae8f;
+}
+
+/* Desktop tab navigation. */
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav {
+	display: flex;
+	align-items: stretch;
+	flex-wrap: wrap;
+	gap: 0;
+	padding: 0;
+	margin: 0 0 2rem;
+	overflow: visible;
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab {
+	appearance: none;
+	display: flex;
+	align-items: center;
+	float: none;
+	min-height: 52px;
+	padding: 6px 22px;
+	margin: 0;
+	position: relative;
+	cursor: pointer;
+	color: rgba(0, 0, 0, .42);
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 40px;
+	text-transform: uppercase;
+	transition: color .2s ease, background-color .2s ease;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab::after {
+	content: "";
+	height: 3px;
+	position: absolute;
+	right: 0;
+	bottom: -1px;
+	left: 0;
+	background: #12ae8f;
+	opacity: 0;
+	transform: scaleX(.6);
+	transition: opacity .2s ease, transform .2s ease;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab:hover {
+	color: rgba(0, 0, 0, .8);
+	background: rgba(18, 174, 143, .04);
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab.nav-tab-active,
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab.nav-tab-active:hover {
+	color: rgba(0, 0, 0, .82);
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab.nav-tab-active::after {
+	opacity: 1;
+	transform: scaleX(1);
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab:focus {
+	color: rgba(0, 0, 0, .82);
+	box-shadow: none;
+	outline: none;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav .nav-tab:focus-visible {
+	z-index: 1;
+	outline: 2px solid #12ae8f;
+	outline-offset: -4px;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subpanel[hidden] {
+	display: none;
+}
+
+.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subpanel > .form-table {
+	margin-top: 0;
+}
+
+/* Match the WordPress administration mobile breakpoint. */
+@media (max-width: 782px) {
+	.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-select-wrap {
+		display: block;
+	}
+
+	.wpsight-settings-page .wpsight-settings-wrap .wpsight-settings-subtab-nav {
+		display: none;
+	}
+}

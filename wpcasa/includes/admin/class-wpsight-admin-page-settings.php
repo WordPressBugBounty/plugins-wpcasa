@@ -77,6 +77,93 @@ class WPSight_Admin_Settings {
 	}
 
 	/**
+	 * Get the optional tabs registered for a settings section.
+	 *
+	 * Tabs are registered in the third section element under the `tabs` key.
+	 * Existing sections without this metadata remain unchanged.
+	 * Tab IDs are sanitized with `sanitize_key()` and retain their registered
+	 * order. Labels remain untranslated here because add-ons are responsible
+	 * for translating their labels when registering the section.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param array $section Settings section data.
+	 * @return array Sanitized tab IDs mapped to their labels.
+	 */
+	public function get_section_tabs( $section ) {
+
+		$tabs = array();
+
+		if ( ! isset( $section[2]['tabs'] ) || ! is_array( $section[2]['tabs'] ) ) {
+			return $tabs;
+		}
+
+		foreach ( $section[2]['tabs'] as $tab_id => $tab_label ) {
+			$tab_id = sanitize_key( $tab_id );
+
+			if ( '' === $tab_id || ! is_scalar( $tab_label ) ) {
+				continue;
+			}
+
+			$tabs[ $tab_id ] = (string) $tab_label;
+		}
+
+		return $tabs;
+	}
+
+	/**
+	 * Group settings fields by their registered section tab.
+	 *
+	 * Fields without a `tab` value remain visible above the tab navigation.
+	 * Fields with an invalid tab value are also kept in the common group so
+	 * that a configuration error never makes a field inaccessible.
+	 *
+	 * The returned `common` element contains unassigned fields. The `tabs`
+	 * element contains one field collection for every registered tab,
+	 * including empty tabs that are populated through rendering hooks.
+	 *
+	 * @since 1.5.4
+	 *
+	 * @param array $section Settings section data.
+	 * @param array $tabs    Sanitized section tabs.
+	 * @return array Common and tab-specific settings fields.
+	 */
+	public function get_section_tab_options( $section, $tabs ) {
+
+		$groups = array(
+			'common' => array(),
+			'tabs'   => array(),
+		);
+
+		foreach ( array_keys( $tabs ) as $tab_id ) {
+			$groups['tabs'][ $tab_id ] = array();
+		}
+
+		if ( ! isset( $section[1] ) || ! is_array( $section[1] ) ) {
+			return $groups;
+		}
+
+		foreach ( $section[1] as $option_key => $option ) {
+			if ( ! is_array( $option ) ) {
+				continue;
+			}
+
+			$tab_id = isset( $option['tab'] ) && is_scalar( $option['tab'] )
+				? sanitize_key( $option['tab'] )
+				: '';
+
+			if ( '' === $tab_id || ! isset( $groups['tabs'][ $tab_id ] ) ) {
+				$groups['common'][ $option_key ] = $option;
+				continue;
+			}
+
+			$groups['tabs'][ $tab_id ][ $option_key ] = $option;
+		}
+
+		return $groups;
+	}
+
+	/**
 	 *	register_settings()
 	 *
 	 *	@access	public
