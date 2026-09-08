@@ -899,6 +899,69 @@ class WPSight_Helpers {
 	}
 
 	/**
+	 * Normalize a price without thousands separators or precision loss.
+	 *
+	 * Ambiguous grouping follows the configured separators. Unambiguous decimal
+	 * input also accepts a dot or comma to support API values and manual entry.
+	 *
+	 * @param mixed $value Price to normalize.
+	 * @return string Localized numeric price, or an empty string for invalid input.
+	 * @since 1.5.5
+	 */
+	public static function normalize_listing_price( $value ) : string {
+		if ( ! is_string( $value ) && ! is_int( $value ) && ! is_float( $value ) ) {
+			return '';
+		}
+
+		$is_number = is_int( $value ) || is_float( $value );
+		$value     = trim( (string) $value );
+		$decimal   = wpsight_get_decimal();
+		$thousands = wpsight_get_thousands_separator();
+		if ( '' === $value || '' === $decimal ) {
+			return '';
+		}
+
+		// Numeric scalars already use a decimal point and are never grouped input.
+		if ( $is_number ) {
+			$value = str_replace( '.', $decimal, $value );
+		}
+
+		// Prefer valid grouping in the configured format for ambiguous input.
+		$grouped = '\d+';
+		if ( '' !== $thousands && $decimal !== $thousands ) {
+			$grouped = '(?:\d+|\d{1,3}(?:' . preg_quote( $thousands, '/' ) . '\d{3})+)';
+		}
+		$pattern = '/^(' . $grouped . ')(?:' . preg_quote( $decimal, '/' ) . '(\d+))?$/D';
+		if ( 1 === preg_match( $pattern, $value, $matches ) ) {
+			$integer  = '' !== $thousands && $decimal !== $thousands ? str_replace( $thousands, '', $matches[1] ) : $matches[1];
+			$fraction = isset( $matches[2] ) ? $matches[2] : '';
+		} else {
+			// Accept an ungrouped decimal or a fully grouped dot/comma alternative.
+			$dot   = strrpos( $value, '.' );
+			$comma = strrpos( $value, ',' );
+			if ( false === $dot && false === $comma ) {
+				return '';
+			}
+
+			$input_decimal = false !== $dot && ( false === $comma || $dot > $comma ) ? '.' : ',';
+			$input_group   = '.' === $input_decimal ? ',' : '.';
+			$pattern       = '/^(\d+|\d{1,3}(?:' . preg_quote( $input_group, '/' ) . '\d{3})+)' . preg_quote( $input_decimal, '/' ) . '(\d+)$/D';
+			if ( 1 !== preg_match( $pattern, $value, $matches ) ) {
+				return '';
+			}
+
+			$integer  = str_replace( $input_group, '', $matches[1] );
+			$fraction = $matches[2];
+		}
+
+		// Keep zero and fractional trailing zeros without converting to a float.
+		$integer = ltrim( $integer, '0' );
+		$integer = '' === $integer ? '0' : $integer;
+
+		return $integer . ( '' !== $fraction ? $decimal . $fraction : '' );
+	}
+
+	/**
 	 * get_decimal()
 	 * 
 	 * Return the decimal separator

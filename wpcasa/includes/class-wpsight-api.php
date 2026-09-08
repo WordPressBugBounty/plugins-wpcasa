@@ -93,7 +93,7 @@ class WPSight_API {
 				sprintf(
 				/* translators: %s: API endpoint slug */
 					esc_html__( 'Endpoint "%s" not allowed.', 'wpcasa' ),
-					$api
+					esc_html( $api )
 				),
 				esc_html__( 'Forbidden', 'wpcasa' ),
 				array( 'response' => 403 )

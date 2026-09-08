@@ -497,45 +497,29 @@ class WPSight_Meta_Boxes {
 	/**
 	 * sanitize_meta_box_listing_price()
 	 *
-	 * Sanitize listing price before saving
-	 * remove space, thousands separator and allow decimal value
+	 * Sanitize listing prices while preserving the configured decimal precision.
 	 *
-	 * @uses wpsight_get_decimal()
-
-	 * @return string sanitized value
+	 * @param mixed $value Submitted price.
+	 * @return string Sanitized price without thousands separators.
 	 *
 	 * @since 1.3.0
 	 */
 	public static function sanitize_meta_box_listing_price( $value ) : string {
 
-		// bail if value is empty
-		if( empty( trim( $value ) ) ) {
-			return trim( $value );
+		$value = WPSight_Helpers::normalize_listing_price( $value );
+		if ( '' === $value ) {
+			return '';
 		}
 
-		// sanitize value and allow only digits, decimal and thousands separator
-		$pattern = '/[^0-9'. wpsight_get_decimal() . wpsight_get_thousands_separator() . ']+/';
-		$value = preg_replace( $pattern, '', $value );
+		$parts  = explode( wpsight_get_decimal(), $value, 2 );
+		$digits = max( 0, (int) apply_filters( 'wpsight_decimal_digits', 2 ) );
 
-		// explode value by the defined decimal separator
-		$value_arr = explode( wpsight_get_decimal(), $value );
-
-		// remove non-digit characters
-		$pre_decimal = preg_replace('~\D~', '', $value_arr[0] );
-
-		// if we have decimal digits
-		if( 1 < count( $value_arr ) ) {
-
-			$decimal_digits = $value_arr[1];
-
-			return $pre_decimal . wpsight_get_decimal() . substr( $decimal_digits, 0, apply_filters( 'wpsight_decimal_digits', 2 ) ) ;
-
+		// Preserve the existing precision filter without rounding the integer part.
+		if ( isset( $parts[1] ) && 0 < $digits ) {
+			return $parts[0] . wpsight_get_decimal() . substr( $parts[1], 0, $digits );
 		}
-		else {
 
-			return $pre_decimal;
-
-		}
+		return $parts[0];
 
 	}
 

@@ -65,14 +65,47 @@ if ( ! class_exists( 'WPSight_About' ) ) :
                             <h3><?php echo esc_html__( 'Changelog', 'wpcasa' ) ?></h3>
 
                             <ul class="tabs" data-tabgroup="first-tab-group">
-                                <li class="tab"><a href="#version-1-5-4" class="active">v1.5.4</a></li>
+                                <li class="tab"><a href="#version-1-5-5" class="active">v1.5.5</a></li>
+                                <li class="tab"><a href="#version-1-5-4">v1.5.4</a></li>
                                 <li class="tab"><a href="#version-1-5-3">v1.5.3</a></li>
                                 <li class="tab"><a href="#version-1-5-2">v1.5.2</a></li>
-                                <li class="tab"><a href="#version-1-5-1">v1.5.1</a></li>
                                 <li><a href="https://wordpress.org/plugins/wpcasa/#developers" target="_blank"><?php echo esc_html__( 'More', 'wpcasa' ); ?></a></li>
                             </ul>
 
                             <section id="first-tab-group" class="tabgroup">
+                                <div id="version-1-5-5">
+                                    <p>Version: 1.5.5</p>
+                                    <table>
+                                        <tr>
+                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
+                                            <td>Allow listing agents to edit their own uploaded images</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Resolved internationalization issues reported by Plugin Check</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Preserve price decimals when saving and displaying listings with different decimal and thousands separators</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Prevent an undefined array key warning when displaying decimal prices</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Fixed missing direct file access protection</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Fixed unescaped parameter and text</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="changelog-entry-fix">Fix</span></td>
+                                            <td>Added version number when loading JavaScript from Listings Map to ensure that the latest version is loaded correctly</td>
+                                        </tr>
+                                    </table>
+                                </div>
                                 <div id="version-1-5-4">
                                     <p>Version: 1.5.4</p>
                                     <table>
@@ -121,27 +154,6 @@ if ( ! class_exists( 'WPSight_About' ) ) :
                                         <tr>
                                             <td><span class="changelog-entry-tweak">Tweak</span></td>
                                             <td>Added redirect to about page after an update.</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div id="version-1-5-1">
-                                    <p>Version: 1.5.1</p>
-                                    <table>
-                                        <tr>
-                                            <td><span class="changelog-entry-new">New</span></td>
-                                            <td>max_nr attribute for 'wpsight_listings' shortcode to limit listings output without pagination.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-fix">Fix</span></td>
-                                            <td>Fixed warning 'open_basedir' restriction when no listing was found.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Improved RTL (right-to-left) on WPCasa settings pages in WordPress backend.</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="changelog-entry-tweak">Tweak</span></td>
-                                            <td>Added notice when editing agent information on user page.</td>
                                         </tr>
                                     </table>
                                 </div>

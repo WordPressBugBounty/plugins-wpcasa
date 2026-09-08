@@ -6,7 +6,7 @@ Tags: real estate, listings, property, rental, realtor
 Requires at least: 6.2
 Requires PHP: 7.2
 Tested up to: 7.1
-Stable tag: 1.5.4
+Stable tag: 1.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -273,6 +273,15 @@ Andrea Manzato
 [Simon Rimkus](https://github.com/simonrimkus)
 
 == Changelog ==
+= 1.5.5 =
+* TWEAK: Allow listing agents to edit their own uploaded images
+* FIX: Preserve price decimals when saving and displaying listings with different decimal and thousands separators
+* Fix: Prevent an undefined array key warning when displaying decimal prices
+* FIX: Resolved internationalization issues reported by Plugin Check
+* FIX: Missing direct file access protection
+* FIX: Unescaped parameter and text
+* FIX: Added version number when loading JavaScript from Listings Map to ensure that the latest version is loaded correctly
+
 = 1.5.4 =
 * NEW: Added tab navigation on settings page
 * TWEAK: Added WPCasa meta fields to REST API

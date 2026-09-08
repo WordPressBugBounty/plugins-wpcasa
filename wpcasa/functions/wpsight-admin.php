@@ -5,6 +5,11 @@
  *	@package WPSight \ Functions
  */
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  *	wpsight_options()
  *	
@@ -141,4 +146,3 @@ if ( ! function_exists( 'wpsight_admin_get_recommendations' ) ) {
         return WPSight_Admin::recommendations();
     }
 }
-

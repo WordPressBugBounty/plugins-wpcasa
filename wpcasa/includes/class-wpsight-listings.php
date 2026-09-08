@@ -1050,27 +1050,19 @@ class WPSight_Listings {
 
             if ( $args['number_format'] === true ) {
 
-                $listing_price_arr = false;
+				$normalized_price = WPSight_Helpers::normalize_listing_price( $listing_price );
+				if ( '' !== $normalized_price ) {
+					$price_parts   = explode( wpsight_get_decimal(), $normalized_price, 2 );
+					$integer_parts = str_split( strrev( $price_parts[0] ), 3 );
 
-				// explode string if decimal number
-                if ( strpos( $listing_price, wpsight_get_decimal() ) )
-                    $listing_price_arr = explode( ',', $listing_price );
+					// Group the integer as a string to avoid rounding large prices.
+					$listing_price = implode( wpsight_get_thousands_separator(), array_reverse( array_map( 'strrev', $integer_parts ) ) );
+					if ( isset( $price_parts[1] ) ) {
+						$listing_price .= wpsight_get_decimal() . $price_parts[1];
+					}
+				}
 
-				// get pre-decimal number
-                if ( is_array( $listing_price_arr ) )
-                    $listing_price = $listing_price_arr[0];
-
-	            if ( is_numeric( $listing_price ) ) {
-
-					// create pre-number value with thousands separator
-                    $listing_price = number_format( $listing_price, 0, '', wpsight_get_thousands_separator() );
-
-					// add decimal number
-                    if ( is_array( $listing_price_arr ) ) {
-                        $listing_price .= wpsight_get_decimal() . $listing_price_arr[1];
-                    }
-
-                }
+				$listing_price = esc_html( $listing_price );
 
             } // endif $args['number_format']
 

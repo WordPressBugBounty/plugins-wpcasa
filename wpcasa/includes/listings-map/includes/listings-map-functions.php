@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  *	wpsight_listings_map()
  *	
@@ -361,7 +367,7 @@ function wpsight_get_listings_map( $atts = array(), $map_query = array() ) {
 	}
 
 	wp_enqueue_script( 'jquery' );
-	wp_register_script( 'cookie', WPSIGHT_PLUGIN_URL . '/assets/js/jquery.cookie' . $suffix . '.js', array(), false, false );
+	wp_register_script( 'cookie', WPSIGHT_PLUGIN_URL . '/assets/js/jquery.cookie' . $suffix . '.js', array(), WPSIGHT_VERSION, false );
 	wp_enqueue_script( 'cookie' );
 	wp_enqueue_script( 'wpsight-google-maps-loader' );
 

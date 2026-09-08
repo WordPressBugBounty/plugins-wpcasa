@@ -566,6 +566,7 @@ class WPSight_Admin {
         echo '<p>';
         echo wp_kses_post(
             sprintf(
+                /* translators: 1: Theme name, 2: Current theme version, 3: Required theme version. */
                 __(
                     '<strong>Theme update required:</strong> Please update %1$s from version %2$s to at least version %3$s so that the location output on the single listing page continues to work correctly.',
                     'wpcasa'
@@ -1421,7 +1422,18 @@ class WPSight_Admin {
 
         $review_url = 'https://wordpress.org/plugins/wpcasa/#reviews';
         $image_url  = WPSIGHT_PLUGIN_URL . '/assets/img/icon.png';
-        $user_name  = '<b>' . esc_html__( $this->get_review_notice_recipient_name() ) . '</b>' ;
+        $user_name  = '<b>' . esc_html( $this->get_review_notice_recipient_name() ) . '</b>';
+        $allowed_message_html = array(
+            'a'  => array(
+                'aria-label' => array(),
+                'class'      => array(),
+                'href'       => array(),
+                'rel'        => array(),
+                'target'     => array(),
+            ),
+            'b'  => array(),
+            'br' => array(),
+        );
         $stars_link = sprintf(
             '<a href="%1$s" target="_blank" rel="noopener noreferrer" class="wpsight-review-notice__text-link wpsight-review-notice__stars" aria-label="%2$s">&#9733;&#9733;&#9733;&#9733;&#9733;</a>',
             esc_url( $review_url ),
@@ -1433,20 +1445,8 @@ class WPSight_Admin {
             esc_html__( 'WordPress.org', 'wpcasa' )
         );
         $message    = sprintf(
-            wp_kses(
-                __( 'Hi %1$s, you have used this free plugin for some time now, and we hope you like it!<br>The contributors of WPCasa have spent countless hours developing it, and it would mean a lot to us if you could rate WPCasa %2$s on %3$s to help us spread the word.<br>It costs you nothing but helps us a lot. We really appreciate your time!', 'wpcasa' ),
-                array(
-                    'a'      => array(
-                        'aria-label' => array(),
-                        'class'      => array(),
-                        'href'       => array(),
-                        'rel'        => array(),
-                        'target'     => array(),
-                    ),
-                    'b' => array(),
-                    'br' => array(),
-                )
-            ),
+            /* translators: 1: User name, 2: Star rating link, 3: WordPress.org review link. */
+            __( 'Hi %1$s, you have used this free plugin for some time now, and we hope you like it!<br>The contributors of WPCasa have spent countless hours developing it, and it would mean a lot to us if you could rate WPCasa %2$s on %3$s to help us spread the word.<br>It costs you nothing but helps us a lot. We really appreciate your time!', 'wpcasa' ),
             $user_name,
             $stars_link,
             $wporg_link
@@ -1458,7 +1458,7 @@ class WPSight_Admin {
         echo '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'WPCasa', 'wpcasa' ) . '" class="wpsight-review-notice__image" />';
         echo '</div>';
         echo '<div class="wpsight-review-notice__content">';
-        echo '<p class="wpsight-review-notice__text">' . $message . '</p>';
+        echo '<p class="wpsight-review-notice__text">' . wp_kses( $message, $allowed_message_html ) . '</p>';
         echo '<p class="wpsight-review-notice__actions">';
         echo '<a href="' . esc_url( $review_url ) . '" target="_blank" rel="noopener noreferrer" class="wpsight-review-notice__button"><span class="wpsight-review-notice__button-icon wpsight-review-notice__button-icon-star">&#9733;</span>' . esc_html__( 'Review WPCasa', 'wpcasa' ) . '</a>';
         echo '<button type="button" class="wpsight-review-notice__button wpsight-review-notice__button-dismiss"><span class="wpsight-review-notice__button-icon wpsight-review-notice__button-icon-close">&#x2705;</span>' . esc_html__( "I've already done it", 'wpcasa' ) . '</button>';

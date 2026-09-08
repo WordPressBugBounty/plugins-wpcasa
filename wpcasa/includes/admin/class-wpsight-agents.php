@@ -157,15 +157,24 @@ class WPSight_Admin_Agents {
 	function recount_attachments( $_counts ) {
 		global $wpdb, $current_user;
 	
-		$and = wp_post_mime_type_where(''); //Default mime type //AND post_author = {$current_user->ID}
-		$count = $wpdb->get_results( "SELECT post_mime_type, COUNT( * ) AS num_posts FROM $wpdb->posts WHERE post_type = 'attachment' AND post_status != 'trash' AND post_author = {$current_user->ID} $and GROUP BY post_mime_type", ARRAY_A );
+		$current_user_id = absint( $current_user->ID );
+		$count           = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_mime_type, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status != 'trash' AND post_author = %d GROUP BY post_mime_type",
+				$current_user_id
+			),
+			ARRAY_A
+		);
 	
 		$counts = array();
 		foreach( (array) $count as $row )
 			$counts[ $row['post_mime_type'] ] = $row['num_posts'];
 	
 		$counts['trash'] = $wpdb->get_var( 
-			$wpdb->prepare( "SELECT COUNT( * ) FROM $wpdb->posts WHERE post_type = 'attachment' AND post_author = %s AND post_status = 'trash' %s", $current_user->ID, $and ) 
+			$wpdb->prepare(
+				"SELECT COUNT( * ) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_author = %d AND post_status = 'trash'",
+				$current_user_id
+			)
 		);
 
 		return $counts;

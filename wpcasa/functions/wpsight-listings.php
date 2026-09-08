@@ -5,6 +5,11 @@
  *	@package WPSight \ Functions
  */
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  *	wpsight_listings()
  *	

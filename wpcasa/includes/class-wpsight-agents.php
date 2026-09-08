@@ -13,13 +13,13 @@ class WPSight_Agents {
 	function __construct() {
 		add_filter( 'pre_get_posts', array( $this, 'author_listings' ) );
 		add_filter( 'get_avatar' , array( $this, 'agent_avatar' ), 1, 5 );
-		add_filter( 'user_has_cap', array( $this, 'allow_agent_own_attachment_deletion' ), 10, 4 );
+		add_filter( 'user_has_cap', array( $this, 'allow_agent_own_attachment_management' ), 10, 4 );
 	}
 
 	/**
-	 * allow_agent_own_attachment_deletion()
+	 * allow_agent_own_attachment_management()
 	 *
-	 * Allow listing agents to delete media files they uploaded themselves.
+	 * Allow listing agents to delete their own media files and edit their own images.
 	 *
 	 * @param array $allcaps User capabilities.
 	 * @param array $caps    Primitive capabilities required for the requested action.
@@ -27,10 +27,14 @@ class WPSight_Agents {
 	 * @param WP_User $user  User object.
 	 * @return array Filtered user capabilities.
 	 *
-	 * @since 1.5.4
+	 * @since 1.5.5
 	 */
-	public function allow_agent_own_attachment_deletion( $allcaps, $caps, $args, $user ) {
-		if ( empty( $args[0] ) || 'delete_post' !== $args[0] || empty( $args[2] ) ) {
+	public function allow_agent_own_attachment_management( $allcaps, $caps, $args, $user ) {
+		if (
+			empty( $args[0] ) ||
+			! in_array( $args[0], array( 'delete_post', 'edit_post' ), true ) ||
+			empty( $args[2] )
+		) {
 			return $allcaps;
 		}
 
@@ -48,12 +52,35 @@ class WPSight_Agents {
 			return $allcaps;
 		}
 
-		// Grant only the primitive caps required for deleting the agent's own attachment.
+		if ( 'edit_post' === $args[0] && ! wp_attachment_is_image( $attachment ) ) {
+			return $allcaps;
+		}
+
+		// Grant only the primitive caps required for managing the agent's own attachment.
 		foreach ( $caps as $cap ) {
 			$allcaps[ $cap ] = true;
 		}
 
 		return $allcaps;
+	}
+
+	/**
+	 * Preserve the former attachment deletion callback for backward compatibility.
+	 *
+	 * @param array   $allcaps User capabilities.
+	 * @param array   $caps    Primitive capabilities required for the requested action.
+	 * @param array   $args    Capability check arguments.
+	 * @param WP_User $user    User object.
+	 * @return array Filtered user capabilities.
+	 *
+	 * @since 1.5.4
+	 */
+	public function allow_agent_own_attachment_deletion( $allcaps, $caps, $args, $user ) {
+		if ( empty( $args[0] ) || 'delete_post' !== $args[0] ) {
+			return $allcaps;
+		}
+
+		return $this->allow_agent_own_attachment_management( $allcaps, $caps, $args, $user );
 	}
 
 	/**

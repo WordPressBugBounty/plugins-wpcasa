@@ -10,9 +10,16 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $listing_id = absint( $_GET['print'] );
 $listing    = get_post( $listing_id );
+$status     = get_post_status( $listing_id );
 
-if ( get_post_status( $listing_id ) !== 'publish' ) {
-	echo '<h2>' . sprintf( esc_html__( 'This listing is %s', 'wpcasa' ), get_post_status( $listing_id ) ) . '</h2>';
+if ( 'publish' !== $status ) {
+	$status_message = sprintf(
+		/* translators: %s: Listing status. */
+		__( 'This listing is %s', 'wpcasa' ),
+		(string) $status
+	);
+
+	echo '<h2>' . esc_html( $status_message ) . '</h2>';
 	return;
 }
 
